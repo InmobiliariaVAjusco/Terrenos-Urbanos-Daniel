@@ -79,55 +79,55 @@ export const SellForm: React.FC<SellFormProps> = ({ onAddLandPlot }) => {
   };
 
   return (
-    <div className="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-lg border border-gray-200">
-      <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">Poner un Terreno en Venta</h2>
+    <div className="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-lg border border-slate-200">
+      <h2 className="text-3xl font-bold text-slate-800 mb-6 text-center">Poner un Terreno en Venta</h2>
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
-          <label htmlFor="address" className="block text-sm font-medium text-gray-700">Ubicación / Dirección</label>
-          <input type="text" name="address" id="address" value={formData.address} onChange={handleChange} required className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-green-500 focus:border-green-500"/>
+          <label htmlFor="address" className="block text-sm font-medium text-slate-700">Ubicación / Dirección</label>
+          <input type="text" name="address" id="address" value={formData.address} onChange={handleChange} required className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm placeholder-slate-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"/>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label htmlFor="price" className="block text-sm font-medium text-gray-700">Precio ($)</label>
-            <input type="number" name="price" id="price" value={formData.price} onChange={handleChange} required className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"/>
+            <label htmlFor="price" className="block text-sm font-medium text-slate-700">Precio ($)</label>
+            <input type="number" name="price" id="price" value={formData.price} onChange={handleChange} required className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"/>
           </div>
            <div>
-            <label htmlFor="sqft" className="block text-sm font-medium text-gray-700">Superficie (m²)</label>
-            <input type="number" name="sqft" id="sqft" value={formData.sqft} onChange={handleChange} required className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"/>
+            <label htmlFor="sqft" className="block text-sm font-medium text-slate-700">Superficie (m²)</label>
+            <input type="number" name="sqft" id="sqft" value={formData.sqft} onChange={handleChange} required className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"/>
           </div>
         </div>
          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label htmlFor="frontage" className="block text-sm font-medium text-gray-700">Frente (m)</label>
-            <input type="number" name="frontage" id="frontage" value={formData.frontage} onChange={handleChange} required className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"/>
+            <label htmlFor="frontage" className="block text-sm font-medium text-slate-700">Frente (m)</label>
+            <input type="number" name="frontage" id="frontage" value={formData.frontage} onChange={handleChange} required className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"/>
           </div>
           <div>
-            <label htmlFor="depth" className="block text-sm font-medium text-gray-700">Fondo (m)</label>
-            <input type="number" name="depth" id="depth" value={formData.depth} onChange={handleChange} required className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"/>
+            <label htmlFor="depth" className="block text-sm font-medium text-slate-700">Fondo (m)</label>
+            <input type="number" name="depth" id="depth" value={formData.depth} onChange={handleChange} required className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"/>
           </div>
         </div>
          <div>
-            <label htmlFor="landUse" className="block text-sm font-medium text-gray-700">Uso de Suelo</label>
-            <select name="landUse" id="landUse" value={formData.landUse} onChange={handleChange} required className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500">
+            <label htmlFor="landUse" className="block text-sm font-medium text-slate-700">Uso de Suelo</label>
+            <select name="landUse" id="landUse" value={formData.landUse} onChange={handleChange} required className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
                 <option>Residencial</option>
                 <option>Comercial</option>
                 <option>Mixto</option>
             </select>
          </div>
         <div>
-          <label htmlFor="services" className="block text-sm font-medium text-gray-700">Servicios (separados por comas)</label>
-          <input type="text" name="services" id="services" value={formData.services} onChange={handleChange} placeholder="Ej: Agua, Luz, Drenaje, Pavimento" className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-green-500 focus:border-green-500"/>
+          <label htmlFor="services" className="block text-sm font-medium text-slate-700">Servicios (separados por comas)</label>
+          <input type="text" name="services" id="services" value={formData.services} onChange={handleChange} placeholder="Ej: Agua, Luz, Drenaje, Pavimento" className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm placeholder-slate-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"/>
         </div>
         <div>
-          <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
-          <textarea name="description" id="description" rows={4} value={formData.description} onChange={handleChange} required className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-green-500 focus:border-green-500"></textarea>
-           <button type="button" onClick={handleGenerateDescription} disabled={isGenerating} className="mt-3 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:bg-gray-400 disabled:cursor-not-allowed transition">
+          <label htmlFor="description" className="block text-sm font-medium text-slate-700 mb-1">Descripción</label>
+          <textarea name="description" id="description" rows={4} value={formData.description} onChange={handleChange} required className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm placeholder-slate-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"></textarea>
+           <button type="button" onClick={handleGenerateDescription} disabled={isGenerating} className="mt-3 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:bg-slate-400 disabled:cursor-not-allowed transition">
              {isGenerating ? 'Generando...' : <><SparkleIcon /> Generar con IA</>}
           </button>
           {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
         </div>
-        <div className="border-t border-gray-200 pt-6">
-            <button type="submit" className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-lg font-bold text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition">
+        <div className="border-t border-slate-200 pt-6">
+            <button type="submit" className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-lg font-bold text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition">
                 Poner en Venta
             </button>
         </div>

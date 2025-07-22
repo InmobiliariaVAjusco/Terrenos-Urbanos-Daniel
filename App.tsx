@@ -31,7 +31,7 @@ function App() {
   }, []);
 
   return (
-    <div className="flex flex-col min-h-screen bg-white font-sans text-green-800">
+    <div className="flex flex-col min-h-screen bg-white font-sans text-slate-800">
       <Header currentView={view} onViewChange={setView} />
       <main className="flex-grow container mx-auto px-4 py-8">
         {view === 'buy' && <PropertyList landPlots={landPlots} onToggleFavorite={handleToggleFavorite} />}

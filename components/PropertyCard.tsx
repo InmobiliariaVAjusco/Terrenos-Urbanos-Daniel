@@ -22,19 +22,19 @@ const formatDateAgo = (isoDate: string): string => {
 
 // Icon components for land plot features
 const FrontageIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1.5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1.5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M4 8h16M4 16h16" />
         <path strokeLinecap="round" strokeLinejoin="round" d="M8 4l-4 4 4 4m8 8l4-4-4-4" />
     </svg>
 );
 const DepthIcon = () => (
-   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1.5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1.5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M8 4v16m8-16v16" />
         <path strokeLinecap="round" strokeLinejoin="round" d="M4 8l4-4 4 4m8 8l-4 4-4-4" />
     </svg>
 );
 const SqftIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1.5 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1.5 text-slate-500" viewBox="0 0 20 20" fill="currentColor">
     <path fillRule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V5h12a1 1 0 100-2H3z" clipRule="evenodd" />
     <path d="M7 7a1 1 0 011-1h8a1 1 0 011 1v8a1 1 0 11-2 0V8H8a1 1 0 01-1-1z" />
   </svg>
@@ -54,7 +54,7 @@ export const PropertyCard: React.FC<PropertyCardProps> = memo(({ property, onSel
   };
 
   return (
-    <div className="group w-full text-left bg-white rounded-lg shadow-md overflow-hidden border border-gray-200 hover:shadow-xl hover:-translate-y-1 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-green-500 transition-all duration-300 flex flex-col">
+    <div className="group w-full text-left bg-white rounded-lg shadow-md overflow-hidden border border-slate-200 hover:shadow-xl hover:-translate-y-1 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500 transition-all duration-300 flex flex-col">
       <div className="relative">
         <button onClick={() => onSelect(property)} className="w-full">
             <img src={property.image} alt={`Vista del terreno en ${property.address}`} className="w-full h-48 object-cover" />
@@ -64,19 +64,19 @@ export const PropertyCard: React.FC<PropertyCardProps> = memo(({ property, onSel
                 <HeartIcon filled={property.isFavorite} />
             </button>
         </div>
-         <div className="absolute top-0 left-0 bg-green-600 text-white font-bold text-lg p-2 m-2 rounded-md shadow-lg">
+         <div className="absolute top-0 left-0 bg-indigo-600 text-white font-bold text-lg p-2 m-2 rounded-md shadow-lg">
           ${property.price.toLocaleString('es-MX')}
         </div>
       </div>
       <div className="p-4 flex-grow flex flex-col">
         <button onClick={() => onSelect(property)} className="text-left flex-grow">
-            <h3 className="font-semibold text-lg text-gray-800 truncate group-hover:text-green-600 transition-colors" title={property.address}>
+            <h3 className="font-semibold text-lg text-slate-800 truncate group-hover:text-indigo-600 transition-colors" title={property.address}>
             {property.address}
             </h3>
-            <p className="text-sm text-gray-500 mb-3">{property.description.substring(0, 70)}...</p>
+            <p className="text-sm text-slate-500 mb-3">{property.description.substring(0, 70)}...</p>
         </button>
-        <div className="border-t border-gray-200 mt-auto pt-3">
-          <div className="flex justify-between items-center text-gray-700">
+        <div className="border-t border-slate-200 mt-auto pt-3">
+          <div className="flex justify-between items-center text-slate-700">
             <span className="flex items-center text-sm" aria-label={`${property.frontage} metros de frente`}>
               <FrontageIcon />
               {property.frontage}m frente
@@ -90,7 +90,7 @@ export const PropertyCard: React.FC<PropertyCardProps> = memo(({ property, onSel
               {property.sqft.toLocaleString('es-MX')} m²
             </span>
           </div>
-          <p className="text-xs text-gray-400 mt-3 text-right">{formatDateAgo(property.publicationDate)}</p>
+          <p className="text-xs text-slate-400 mt-3 text-right">{formatDateAgo(property.publicationDate)}</p>
         </div>
       </div>
     </div>
