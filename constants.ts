@@ -1,5 +1,12 @@
 import { LandPlot } from './types';
 
+// Helper to get past dates for more realistic data
+const getPastDate = (daysAgo: number) => {
+  const date = new Date();
+  date.setDate(date.getDate() - daysAgo);
+  return date.toISOString();
+};
+
 export const INITIAL_LAND_PLOTS: LandPlot[] = [
   {
     id: 1,
@@ -11,7 +18,9 @@ export const INITIAL_LAND_PLOTS: LandPlot[] = [
     landUse: 'Residencial',
     image: 'https://picsum.photos/seed/land1/600/400',
     description: 'Excelente terreno plano con uso de suelo residencial, ideal para construir la casa de tus sueños en un entorno boscoso y tranquilo. Vistas parciales a la montaña.',
-    services: ['Agua', 'Luz']
+    services: ['Agua', 'Luz'],
+    publicationDate: getPastDate(5),
+    isFavorite: false,
   },
   {
     id: 2,
@@ -23,7 +32,9 @@ export const INITIAL_LAND_PLOTS: LandPlot[] = [
     landUse: 'Comercial',
     image: 'https://picsum.photos/seed/land2/600/400',
     description: 'Oportunidad única para inversionistas. Terreno en esquina sobre avenida principal con alto flujo vehicular, perfecto para locales comerciales o una plaza pequeña.',
-    services: ['Agua', 'Luz', 'Drenaje']
+    services: ['Agua', 'Luz', 'Drenaje'],
+    publicationDate: getPastDate(12),
+    isFavorite: false,
   },
   {
     id: 3,
@@ -35,7 +46,9 @@ export const INITIAL_LAND_PLOTS: LandPlot[] = [
     landUse: 'Residencial',
     image: 'https://picsum.photos/seed/land3/600/400',
     description: 'Terreno descendente con espectaculares vistas panorámicas. Ubicado dentro de un fraccionamiento privado con seguridad las 24 horas.',
-    services: ['Agua', 'Luz', 'Seguridad Privada']
+    services: ['Agua', 'Luz', 'Seguridad Privada'],
+    publicationDate: getPastDate(30),
+    isFavorite: false,
   },
   {
     id: 4,
@@ -47,7 +60,9 @@ export const INITIAL_LAND_PLOTS: LandPlot[] = [
     landUse: 'Mixto',
     image: 'https://picsum.photos/seed/land4/600/400',
     description: 'Amplio terreno con uso de suelo mixto. Ideal para desarrollar un proyecto de departamentos con locales comerciales en la planta baja. Zona de alta plusvalía.',
-    services: ['Agua', 'Luz', 'Drenaje', 'Pavimento']
+    services: ['Agua', 'Luz', 'Drenaje', 'Pavimento'],
+    publicationDate: getPastDate(2),
+    isFavorite: false,
   },
   {
     id: 5,
@@ -59,7 +74,9 @@ export const INITIAL_LAND_PLOTS: LandPlot[] = [
     landUse: 'Residencial',
     image: 'https://picsum.photos/seed/land5/600/400',
     description: 'Terreno rústico de gran tamaño, perfecto para una casa de campo o para siembra. Entorno natural y pacífico, a solo minutos de la carretera principal.',
-    services: ['Toma de agua cercana']
+    services: ['Toma de agua cercana'],
+    publicationDate: getPastDate(45),
+    isFavorite: false,
   },
   {
     id: 6,
@@ -71,6 +88,8 @@ export const INITIAL_LAND_PLOTS: LandPlot[] = [
     landUse: 'Comercial',
     image: 'https://picsum.photos/seed/land6/600/400',
     description: 'Terreno plano de uso comercial/industrial, estratégicamente ubicado con acceso directo a la carretera. Ideal para bodegas, talleres o centro de distribución.',
-    services: ['Luz de alta tensión', 'Agua']
+    services: ['Luz de alta tensión', 'Agua'],
+    publicationDate: getPastDate(8),
+    isFavorite: false,
   },
 ];

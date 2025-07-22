@@ -4,63 +4,95 @@ import { LandPlot } from '../types';
 interface PropertyCardProps {
   property: LandPlot;
   onSelect: (property: LandPlot) => void;
+  onToggleFavorite: (id: number) => void;
 }
+
+// Helper to format date
+const formatDateAgo = (isoDate: string): string => {
+    const date = new Date(isoDate);
+    const now = new Date();
+    const diffTime = Math.abs(now.getTime() - date.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    if (diffDays <= 1) return 'Publicado hoy';
+    if (diffDays <= 30) return `Publicado hace ${diffDays} días`;
+    if (diffDays <= 365) return `Publicado hace ${Math.floor(diffDays / 30)} meses`;
+    return `Publicado hace ${Math.floor(diffDays / 365)} años`;
+};
 
 // Icon components for land plot features
 const FrontageIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1.5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M11 17l-5-5m0 0l5-5m-5 5h12" />
-        <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1.5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M4 8h16M4 16h16" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M8 4l-4 4 4 4m8 8l4-4-4-4" />
     </svg>
 );
-
 const DepthIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1.5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-        <path strokeLinecap="round" strokeLinejoin="round" d="M7 16l-4-4m0 0l4-4m-4 4h18" />
+   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1.5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M8 4v16m8-16v16" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M4 8l4-4 4 4m8 8l-4 4-4-4" />
     </svg>
 );
-
 const SqftIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1.5 text-slate-500" viewBox="0 0 20 20" fill="currentColor">
-    <path fillRule="evenodd" d="M3 8V4h4L3 8zm14-4v4h-4l4-4zM8 17v-4H4l4 4zm8-4h-4v4l4-4z" clipRule="evenodd" />
+  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1.5 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+    <path fillRule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V5h12a1 1 0 100-2H3z" clipRule="evenodd" />
+    <path d="M7 7a1 1 0 011-1h8a1 1 0 011 1v8a1 1 0 11-2 0V8H8a1 1 0 01-1-1z" />
   </svg>
 );
 
-export const PropertyCard: React.FC<PropertyCardProps> = memo(({ property, onSelect }) => {
+const HeartIcon = ({ filled }: { filled: boolean }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" className={`h-6 w-6 transition-all duration-200 ${ filled ? 'text-red-500' : 'text-gray-300 hover:text-red-400' }`} viewBox="0 0 20 20" fill="currentColor">
+        <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" />
+    </svg>
+);
+
+
+export const PropertyCard: React.FC<PropertyCardProps> = memo(({ property, onSelect, onToggleFavorite }) => {
+  const handleFavoriteClick = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent modal from opening
+    onToggleFavorite(property.id);
+  };
+
   return (
-    <button
-      onClick={() => onSelect(property)}
-      className="group w-full text-left bg-white rounded-lg shadow-md overflow-hidden border border-slate-200 hover:shadow-xl hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 transition-all duration-300"
-      aria-label={`Ver detalles de ${property.address}`}
-    >
+    <div className="group w-full text-left bg-white rounded-lg shadow-md overflow-hidden border border-gray-200 hover:shadow-xl hover:-translate-y-1 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-green-500 transition-all duration-300 flex flex-col">
       <div className="relative">
-        <img src={property.image} alt={`Vista del terreno en ${property.address}`} className="w-full h-48 object-cover" />
-        <div className="absolute top-0 right-0 bg-teal-600 text-white font-bold text-lg p-2 m-2 rounded-md shadow-lg">
-          ${property.price.toLocaleString('es-ES')}
+        <button onClick={() => onSelect(property)} className="w-full">
+            <img src={property.image} alt={`Vista del terreno en ${property.address}`} className="w-full h-48 object-cover" />
+        </button>
+        <div className="absolute top-2 right-2">
+            <button onClick={handleFavoriteClick} className="p-2 rounded-full bg-black/40 hover:bg-black/60" aria-label="Añadir a favoritos">
+                <HeartIcon filled={property.isFavorite} />
+            </button>
+        </div>
+         <div className="absolute top-0 left-0 bg-green-600 text-white font-bold text-lg p-2 m-2 rounded-md shadow-lg">
+          ${property.price.toLocaleString('es-MX')}
         </div>
       </div>
-      <div className="p-4">
-        <h3 className="font-semibold text-lg text-slate-800 truncate group-hover:text-teal-600 transition-colors" title={property.address}>
-          {property.address}
-        </h3>
-        <p className="text-sm text-slate-500 mb-3 truncate">{property.description.substring(0, 70)}...</p>
-        <div className="border-t border-slate-200 my-3"></div>
-        <div className="flex justify-between items-center text-slate-700">
-          <span className="flex items-center text-sm" aria-label={`${property.frontage} metros de frente`}>
-            <FrontageIcon />
-            {property.frontage}m frente
-          </span>
-          <span className="flex items-center text-sm" aria-label={`${property.depth} metros de fondo`}>
-            <DepthIcon />
-            {property.depth}m fondo
-          </span>
-          <span className="flex items-center text-sm" aria-label={`${property.sqft.toLocaleString('es-ES')} metros cuadrados`}>
-            <SqftIcon />
-            {property.sqft.toLocaleString('es-ES')} m²
-          </span>
+      <div className="p-4 flex-grow flex flex-col">
+        <button onClick={() => onSelect(property)} className="text-left flex-grow">
+            <h3 className="font-semibold text-lg text-gray-800 truncate group-hover:text-green-600 transition-colors" title={property.address}>
+            {property.address}
+            </h3>
+            <p className="text-sm text-gray-500 mb-3">{property.description.substring(0, 70)}...</p>
+        </button>
+        <div className="border-t border-gray-200 mt-auto pt-3">
+          <div className="flex justify-between items-center text-gray-700">
+            <span className="flex items-center text-sm" aria-label={`${property.frontage} metros de frente`}>
+              <FrontageIcon />
+              {property.frontage}m frente
+            </span>
+            <span className="flex items-center text-sm" aria-label={`${property.depth} metros de fondo`}>
+              <DepthIcon />
+              {property.depth}m fondo
+            </span>
+            <span className="flex items-center text-sm" aria-label={`${property.sqft.toLocaleString('es-MX')} metros cuadrados`}>
+              <SqftIcon />
+              {property.sqft.toLocaleString('es-MX')} m²
+            </span>
+          </div>
+          <p className="text-xs text-gray-400 mt-3 text-right">{formatDateAgo(property.publicationDate)}</p>
         </div>
       </div>
-    </button>
+    </div>
   );
 });

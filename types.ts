@@ -11,4 +11,6 @@ export interface LandPlot {
   image: string;
   description: string;
   services: string[]; // e.g. ['Agua', 'Luz', 'Drenaje']
+  publicationDate: string; // ISO 8601 date string
+  isFavorite: boolean;
 }
