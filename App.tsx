@@ -8,9 +8,52 @@ import { ReviewsSection } from './components/ReviewsSection';
 import { LoginModal } from './components/LoginModal';
 import { Property, User, Review } from './types';
 import { INITIAL_PROPERTIES, INITIAL_REVIEWS } from './constants';
-import { auth } from './firebase';
+import { auth, firebaseInitError } from './firebase';
 
 type View = 'buy' | 'sell' | 'favorites';
+
+const ApiKeyErrorScreen = () => (
+    <div className="flex flex-col items-center justify-center min-h-screen bg-red-50 text-red-800 p-4">
+        <div className="w-16 h-16 text-red-500 mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+            </svg>
+        </div>
+        <h1 className="text-3xl font-bold mb-2 text-center">Configuración Requerida</h1>
+        <p className="text-lg text-center max-w-2xl">
+            Para que la aplicación funcione, es necesario configurar tu clave de API de Firebase.
+        </p>
+        <div className="mt-6 p-4 bg-red-100 rounded-lg text-left font-mono text-sm max-w-2xl w-full shadow-inner">
+            <p className="font-bold">Acción requerida:</p>
+            <ol className="list-decimal list-inside mt-2 space-y-2">
+                <li>Abre el archivo: <code className="bg-red-200 px-2 py-1 rounded">firebase.ts</code></li>
+                <li>Encuentra la línea que contiene el texto: <code className="bg-red-200 px-2 py-1 rounded">'DEBES_PEGAR_TU_API_KEY_DE_FIREBASE_AQUI'</code></li>
+                <li>Reemplaza ese texto con tu clave de API real desde la Consola de Firebase.</li>
+            </ol>
+        </div>
+    </div>
+);
+
+const FirebaseInitErrorScreen = ({ error }: { error: Error }) => (
+    <div className="flex flex-col items-center justify-center min-h-screen bg-orange-50 text-orange-800 p-4">
+        <div className="w-16 h-16 text-orange-500 mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.852l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
+            </svg>
+        </div>
+        <h1 className="text-3xl font-bold mb-2 text-center">Error de Inicialización</h1>
+        <p className="text-lg text-center max-w-2xl">
+            No se pudo conectar con los servicios de la aplicación.
+        </p>
+        <div className="mt-6 p-4 bg-orange-100 rounded-lg text-left font-mono text-sm max-w-2xl w-full shadow-inner">
+            <p className="font-bold">Detalle del error:</p>
+            <p className="mt-2">{error.message}</p>
+            <p className="mt-4 text-xs">
+                Esto puede deberse a un problema de red, un error de configuración del script de Firebase, o un bloqueador de scripts en tu navegador. Revisa la consola para más detalles.
+            </p>
+        </div>
+    </div>
+);
 
 function App() {
   const [view, setView] = useState<View>('buy');
@@ -21,7 +64,16 @@ function App() {
   const [isLoginModalOpen, setLoginModalOpen] = useState(false);
   const [isLoadingAuth, setIsLoadingAuth] = useState(true);
 
+  // Sistema de verificación robusto para la inicialización de Firebase.
+  if (firebaseInitError) {
+    if (firebaseInitError.message === "API_KEY_MISSING") {
+      return <ApiKeyErrorScreen />;
+    }
+    return <FirebaseInitErrorScreen error={firebaseInitError} />;
+  }
+
   useEffect(() => {
+    // Como firebaseInitError es nulo, podemos asumir que 'auth' está disponible.
     const unsubscribe = auth.onAuthStateChanged(user => {
       if (user) {
         setCurrentUser({
@@ -30,8 +82,6 @@ function App() {
           email: user.email,
           photoURL: user.photoURL,
         });
-        // In a real app, you would load user-specific data like favorites from a database here.
-        // For now, we reset favorites on login.
         setFavorites([]);
       } else {
         setCurrentUser(null);

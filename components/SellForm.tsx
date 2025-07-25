@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Property, PropertyType } from '../types';
 
@@ -6,6 +5,7 @@ interface SellFormProps {
   onAddProperty: (property: Omit<Property, 'publicationDate'>) => void;
 }
 
+// Icons
 const CloseIcon = () => (
     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
         <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
@@ -49,10 +49,14 @@ export const SellForm: React.FC<SellFormProps> = ({ onAddProperty }) => {
         images: prev.images.filter((_, index) => index !== indexToRemove)
     }));
   };
-
+  
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    if (!formData.address || !formData.price || !formData.sqft || !formData.description) {
+      setError('Por favor, completa todos los campos requeridos, incluyendo la descripción.');
+      return;
+    }
     if (formData.images.length === 0) {
       setError('Por favor, sube al menos una imagen para el inmueble.');
       return;
@@ -143,8 +147,8 @@ export const SellForm: React.FC<SellFormProps> = ({ onAddProperty }) => {
           </div>
         </div>
         <div>
-          <label htmlFor="description" className="block text-sm font-medium text-slate-700 mb-1">Descripción</label>
-          <textarea name="description" id="description" rows={4} value={formData.description} onChange={handleChange} required className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm placeholder-slate-400 focus:outline-none focus:ring-green-500 focus:border-green-500"></textarea>
+          <label htmlFor="description" className="block text-sm font-medium text-slate-700">Descripción</label>
+          <textarea name="description" id="description" rows={5} value={formData.description} onChange={handleChange} required className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm placeholder-slate-400 focus:outline-none focus:ring-green-500 focus:border-green-500"></textarea>
           {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
         </div>
         <div className="border-t border-slate-200 pt-6">
