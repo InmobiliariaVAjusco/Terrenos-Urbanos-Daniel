@@ -4,61 +4,54 @@ import { Logo } from './Logo';
 import { User } from '../types';
 import { UserMenu } from './UserMenu';
 
-type View = 'buy' | 'sell' | 'favorites';
-
 interface HeaderProps {
-  currentView: View;
-  onViewChange: (view: View) => void;
-  currentUser: User | null;
-  onLogout: () => void;
-  onLoginClick: () => void;
+    onMenuClick: () => void;
+    currentUser: User | null;
+    onLogout: () => void;
+    onLoginClick: () => void;
+    onShowFavorites: () => void;
 }
 
-const getLinkClass = (view: View, currentView: View) => {
-  return `px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
-    currentView === view
-      ? 'bg-white text-green-700 shadow-md'
-      : 'text-green-100 hover:bg-green-700 hover:text-white'
-  }`;
-};
+const MenuIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+    </svg>
+);
 
-export const Header: React.FC<HeaderProps> = ({ currentView, onViewChange, currentUser, onLogout, onLoginClick }) => {
-  return (
-    <header className="bg-green-800 shadow-lg sticky top-0 z-40">
-      <nav className="container mx-auto px-4 py-3">
-        <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-                <Logo />
-                <div className="hidden sm:flex items-center gap-4">
-                  <div className="w-px h-8 bg-green-700"></div>
-                  <span className="text-green-200 font-semibold">
-                    Ajusco Tlalpan CDMX
-                  </span>
+export const Header: React.FC<HeaderProps> = ({ onMenuClick, currentUser, onLogout, onLoginClick, onShowFavorites }) => {
+    return (
+        <header className="bg-green-700 text-white shadow-md sticky top-0 z-30">
+            <div className="container mx-auto px-4 py-3 flex items-center justify-between">
+                {/* Left Side: Menu Toggle & Brand */}
+                <div className="flex items-center gap-4">
+                    <button 
+                        onClick={onMenuClick} 
+                        className="p-2 -ml-2 text-green-200 hover:text-white transition-colors"
+                        aria-label="Abrir menú de navegación"
+                    >
+                        <MenuIcon />
+                    </button>
+                    <Logo />
+                    <div className="hidden sm:flex items-center">
+                       <div className="w-px h-8 bg-green-600/70 mx-4"></div>
+                       <span className="font-semibold text-green-200 tracking-wide">Ajusco Tlalpan CDMX</span>
+                    </div>
+                </div>
+
+                {/* Right Side: Login/User Menu */}
+                <div className="flex items-center">
+                    {currentUser ? (
+                        <UserMenu user={currentUser} onLogout={onLogout} onShowFavorites={onShowFavorites} />
+                    ) : (
+                         <button
+                            onClick={onLoginClick}
+                            className="px-4 py-2 rounded-lg text-sm font-bold text-white bg-green-600 hover:bg-green-500 transition-all duration-200 shadow-sm"
+                        >
+                            Ingresar
+                        </button>
+                    )}
                 </div>
             </div>
-            <div className="flex items-center space-x-2">
-                <div className="hidden sm:flex items-center space-x-1 bg-green-900/50 p-1 rounded-lg">
-                    <button onClick={() => onViewChange('buy')} className={getLinkClass('buy', currentView)}>
-                    Comprar
-                    </button>
-                    <button onClick={() => onViewChange('sell')} className={getLinkClass('sell', currentView)}>
-                    Vender
-                    </button>
-                </div>
-                <div className="w-px h-8 bg-green-700 mx-2 hidden sm:block"></div>
-                {currentUser ? (
-                    <UserMenu user={currentUser} onLogout={onLogout} onShowFavorites={() => onViewChange('favorites')} />
-                ) : (
-                    <button 
-                        onClick={onLoginClick} 
-                        className="px-5 py-2.5 rounded-lg text-sm font-bold text-white bg-green-600 hover:bg-green-500 transition-colors duration-200 shadow"
-                    >
-                        Ingresar
-                    </button>
-                )}
-          </div>
-        </div>
-      </nav>
-    </header>
-  );
+        </header>
+    );
 };

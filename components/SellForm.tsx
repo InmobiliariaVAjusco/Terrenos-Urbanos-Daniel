@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Property, PropertyType } from '../types';
 
 interface SellFormProps {
@@ -12,6 +12,14 @@ const CloseIcon = () => (
     </svg>
 );
 
+const UploadingSpinner = () => (
+    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+    </svg>
+);
+
+
 export const SellForm: React.FC<SellFormProps> = ({ onAddProperty }) => {
   const [formData, setFormData] = useState({
     address: '',
@@ -22,45 +30,59 @@ export const SellForm: React.FC<SellFormProps> = ({ onAddProperty }) => {
     propertyType: 'Residencial' as PropertyType,
     services: '',
     description: '',
-    images: [] as string[],
   });
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
+  
+  const fileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = error => reject(error);
+    });
+  };
 
-  const handleImagesChange = (files: FileList | null) => {
+  const handleImagesChange = async (files: FileList | null) => {
     if (files) {
-      const fileList = Array.from(files);
-      fileList.forEach(file => {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          setFormData(prev => ({ ...prev, images: [...prev.images, reader.result as string] }));
-        };
-        reader.readAsDataURL(file);
-      });
+      const newFiles = Array.from(files);
+      const base64Promises = newFiles.map(fileToBase64);
+      try {
+        const newPreviews = await Promise.all(base64Promises);
+        setImagePreviews(prev => [...prev, ...newPreviews]);
+      } catch (err) {
+        console.error("Error converting files to Base64", err);
+        setError("Hubo un error al procesar las imágenes.");
+      }
     }
   };
   
   const handleRemoveImage = (indexToRemove: number) => {
-    setFormData(prev => ({
-        ...prev,
-        images: prev.images.filter((_, index) => index !== indexToRemove)
-    }));
+      setImagePreviews(prev => prev.filter((_, index) => index !== indexToRemove));
   };
-  
-  const handleSubmit = (e: React.FormEvent) => {
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     if (!formData.address || !formData.price || !formData.sqft || !formData.description) {
-      setError('Por favor, completa todos los campos requeridos, incluyendo la descripción.');
+      setError('Por favor, completa todos los campos requeridos.');
       return;
     }
-    if (formData.images.length === 0) {
+    if (imagePreviews.length === 0) {
       setError('Por favor, sube al menos una imagen para el inmueble.');
       return;
     }
+
+    setIsLoading(true);
+
+    // Simulate a short delay for UX
+    await new Promise(res => setTimeout(res, 500));
+      
     const newProperty: Omit<Property, 'publicationDate'> = {
       id: Date.now(),
       address: formData.address,
@@ -71,9 +93,11 @@ export const SellForm: React.FC<SellFormProps> = ({ onAddProperty }) => {
       propertyType: formData.propertyType,
       services: formData.services.split(',').map(f => f.trim()).filter(f => f),
       description: formData.description,
-      images: formData.images,
+      images: imagePreviews, // Use the Base64 previews directly
     };
     onAddProperty(newProperty);
+
+    setIsLoading(false);
   };
 
   return (
@@ -118,9 +142,9 @@ export const SellForm: React.FC<SellFormProps> = ({ onAddProperty }) => {
         </div>
         <div>
           <label className="block text-sm font-medium text-slate-700">Imágenes del Inmueble</label>
-            {formData.images.length > 0 && (
+            {imagePreviews.length > 0 && (
                 <div className="mt-2 grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 gap-3">
-                    {formData.images.map((image, index) => (
+                    {imagePreviews.map((image, index) => (
                         <div key={index} className="relative group aspect-square">
                             <img src={image} alt={`Vista previa ${index + 1}`} className="w-full h-full object-cover rounded-md shadow-md" />
                             <button type="button" onClick={() => handleRemoveImage(index)} className="absolute top-0 right-0 -m-2 p-1 bg-red-600 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity focus:opacity-100" aria-label={`Eliminar imagen ${index + 1}`}>
@@ -152,8 +176,9 @@ export const SellForm: React.FC<SellFormProps> = ({ onAddProperty }) => {
           {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
         </div>
         <div className="border-t border-slate-200 pt-6">
-            <button type="submit" className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-lg font-bold text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition">
-                Poner en Venta
+            <button type="submit" disabled={isLoading} className="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-md shadow-sm text-lg font-bold text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition disabled:bg-slate-400 disabled:cursor-not-allowed">
+                {isLoading && <UploadingSpinner />}
+                {isLoading ? 'Publicando Inmueble...' : 'Poner en Venta'}
             </button>
         </div>
       </form>

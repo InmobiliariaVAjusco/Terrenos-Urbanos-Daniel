@@ -2,12 +2,13 @@
 declare const firebase: any;
 
 // Tu configuración de Firebase
-// ¡IMPORTANTE! La clave de API es necesaria para que la aplicación funcione.
+// ¡IMPORTANTE! Pega aquí tu clave de API de Firebase.
 export const firebaseConfig = {
-  apiKey: 'AIzaSyCcU2CbpSkVSVfHIAOvePo7fjlJSRtVjgA',
+  // REEMPLAZA "TU_API_KEY_AQUI" CON TU CLAVE DE API REAL DE FIREBASE
+  apiKey: "AIzaSyCcU2CbpSkVSVfHIAOvePo7fjlJSRtVjgA", 
   authDomain: "inmuebles-v.firebaseapp.com",
   projectId: "inmuebles-v",
-  storageBucket: "inmuebles-v.firebasestorage.app",
+  storageBucket: "inmuebles-v.appspot.com",
   messagingSenderId: "114763072584",
   appId: "1:114763072584:web:f69c04f80240f446ef447d",
   measurementId: "G-GZTLWX96VR"
@@ -25,8 +26,8 @@ try {
 
   // Luego, inicializar la app solo si no se ha hecho antes
   if (!firebase.apps.length) {
-    // Validar que la API key esté presente y no sea el placeholder
-    if (!firebaseConfig.apiKey || firebaseConfig.apiKey.includes('DEBES_PEGAR_TU_API_KEY_DE_FIREBASE_AQUI')) {
+    // Validar que la API key se haya reemplazado
+    if (firebaseConfig.apiKey === "TU_API_KEY_AQUI" || !firebaseConfig.apiKey) {
       throw new Error("API_KEY_MISSING");
     }
     firebase.initializeApp(firebaseConfig);
@@ -34,6 +35,15 @@ try {
 
   // Finalmente, exportar los servicios
   authInstance = firebase.auth();
+  
+  // Se establece explícitamente la persistencia a 'local'.
+  // Esto soluciona errores en entornos donde la detección automática de almacenamiento puede fallar
+  // (ej. "web storage must be enabled").
+  authInstance.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+    .catch((error: any) => {
+        console.error("Error al establecer la persistencia de Firebase:", error);
+    });
+
   googleProviderInstance = firebase.auth.GoogleAuthProvider;
 
 } catch (e: any) {

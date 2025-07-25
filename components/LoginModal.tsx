@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Modal } from './Modal';
 import { auth, GoogleAuthProvider } from '../firebase';
@@ -8,6 +9,20 @@ interface LoginModalProps {
 }
 
 const FacebookIcon = () => ( <svg className="w-5 h-5" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M504 256C504 119 393 8 256 8S8 119 8 256c0 123.78 90.69 226.38 209.25 245V327.69h-63V256h63v-54.64c0-62.15 37-96.48 93.67-96.48 27.14 0 55.52 4.84 55.52 4.84v61h-31.28c-30.8 0-40.41 19.12-40.41 38.73V256h68.78l-11 71.69h-57.78V501C413.31 482.38 504 379.78 504 256z"></path></svg> );
+
+const EyeIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-slate-500" viewBox="0 0 20 20" fill="currentColor">
+        <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+        <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.022 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
+    </svg>
+);
+
+const EyeOffIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-slate-500" viewBox="0 0 20 20" fill="currentColor">
+        <path fillRule="evenodd" d="M3.707 2.293a1 1 0 00-1.414 1.414l14 14a1 1 0 001.414-1.414l-1.473-1.473A10.014 10.014 0 0019.542 10C18.268 5.943 14.478 3 10 3a9.958 9.958 0 00-4.512 1.074l-1.78-1.781zM9 4.804A7.968 7.968 0 0110 5c3.478 0 6.522 2.168 7.824 5.253a9.981 9.981 0 01-2.073 3.328l-1.325-1.325A3.983 3.983 0 0010 8a4 4 0 00-4 4 3.983 3.983 0 00.158 1.085l-1.325-1.325A7.968 7.968 0 015 10c1.302-3.085 4.346-5.196 6.176-5.196a9.956 9.956 0 01-2.176-.804z" clipRule="evenodd" />
+    </svg>
+);
+
 
 export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
   const [activeTab, setActiveTab] = useState<'login' | 'register'>('login');
@@ -20,6 +35,9 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
   useEffect(() => {
     if (!isOpen) {
       setName('');
@@ -29,6 +47,8 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
       setError('');
       setIsLoading(false);
       setActiveTab('login');
+      setShowPassword(false);
+      setShowConfirmPassword(false);
     }
   }, [isOpen]);
   
@@ -153,7 +173,12 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                 </div>
                 <div>
                   <label htmlFor="password-login" className="block text-sm font-medium text-slate-700"> Contraseña </label>
-                  <input id="password-login" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required className="mt-1 block w-full px-4 py-3 bg-white border border-slate-300 rounded-md shadow-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="••••••••" />
+                  <div className="relative mt-1">
+                    <input id="password-login" type={showPassword ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} required className="block w-full px-4 py-3 bg-white border border-slate-300 rounded-md shadow-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-green-500 pr-10" placeholder="••••••••" />
+                    <button type="button" onClick={() => setShowPassword(p => !p)} className="absolute inset-y-0 right-0 flex items-center px-3 text-slate-500 hover:text-slate-700" aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}>
+                        {showPassword ? <EyeOffIcon /> : <EyeIcon />}
+                    </button>
+                  </div>
                 </div>
                 <button type="submit" disabled={isLoading} className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-lg font-bold text-white bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all hover:scale-[1.02] active:scale-[0.98] disabled:from-slate-400 disabled:to-slate-500 disabled:scale-100">
                   {isLoading ? 'Cargando...' : 'Continuar'}
@@ -172,11 +197,21 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                 </div>
                 <div>
                   <label htmlFor="password-register" className="block text-sm font-medium text-slate-700"> Contraseña </label>
-                  <input id="password-register" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required className="mt-1 block w-full px-4 py-2.5 bg-white border border-slate-300 rounded-md shadow-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="Mínimo 6 caracteres" />
+                   <div className="relative mt-1">
+                    <input id="password-register" type={showPassword ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} required className="block w-full px-4 py-2.5 bg-white border border-slate-300 rounded-md shadow-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-green-500 pr-10" placeholder="Mínimo 6 caracteres" />
+                    <button type="button" onClick={() => setShowPassword(p => !p)} className="absolute inset-y-0 right-0 flex items-center px-3 text-slate-500 hover:text-slate-700" aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}>
+                        {showPassword ? <EyeOffIcon /> : <EyeIcon />}
+                    </button>
+                   </div>
                 </div>
                  <div>
                   <label htmlFor="confirm-password-register" className="block text-sm font-medium text-slate-700"> Confirmar Contraseña </label>
-                  <input id="confirm-password-register" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required className="mt-1 block w-full px-4 py-2.5 bg-white border border-slate-300 rounded-md shadow-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="Repite tu contraseña" />
+                  <div className="relative mt-1">
+                    <input id="confirm-password-register" type={showConfirmPassword ? 'text' : 'password'} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required className="block w-full px-4 py-2.5 bg-white border border-slate-300 rounded-md shadow-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-green-500 pr-10" placeholder="Repite tu contraseña" />
+                     <button type="button" onClick={() => setShowConfirmPassword(p => !p)} className="absolute inset-y-0 right-0 flex items-center px-3 text-slate-500 hover:text-slate-700" aria-label={showConfirmPassword ? "Ocultar contraseña" : "Mostrar contraseña"}>
+                        {showConfirmPassword ? <EyeOffIcon /> : <EyeIcon />}
+                    </button>
+                  </div>
                 </div>
                 <button type="submit" disabled={isLoading} className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-lg font-bold text-white bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all hover:scale-[1.02] active:scale-[0.98] disabled:from-slate-400 disabled:to-slate-500 disabled:scale-100">
                   {isLoading ? 'Creando cuenta...' : 'Crear Cuenta'}
@@ -194,7 +229,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
 
             <div className="flex justify-center gap-4">
                 <button onClick={handleGoogleSignIn} disabled={isLoading} className="w-12 h-12 flex items-center justify-center border border-slate-300 bg-white rounded-full hover:bg-slate-100 transition-colors p-2" aria-label="Ingresar con Google">
-                   <img src="https://i.pinimg.com/1200x/60/41/99/604199df880fb029291ddd7c382e828b.jpg" alt="Google" className="w-full h-full object-contain" />
+                   <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google" className="w-auto h-full object-contain" />
                 </button>
                 <button disabled className="w-12 h-12 flex items-center justify-center border border-slate-300 text-slate-400 bg-white rounded-full cursor-not-allowed" aria-label="Ingresar con Facebook (Próximamente)"><FacebookIcon /></button>
             </div>

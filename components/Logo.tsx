@@ -1,15 +1,14 @@
+
 import React from 'react';
 
 export const Logo = () => (
     <div className="flex items-center gap-3">
-        {/* New Image Logo */}
         <img
-            src="https://i.pinimg.com/736x/47/02/63/470263ed329d5dda16ab72e5a1b88fae.jpg"
+            src="https://i.pinimg.com/736x/d2/14/dd/d214dd866c5777d83c201b5f9b43a383.jpg"
             alt="Logo de Inmuebles V"
-            className="h-14 w-14 rounded-lg shadow-md object-cover"
+            className="h-12 w-12 object-cover rounded-md"
         />
-        {/* Brand Name */}
-        <span className="text-3xl font-bold tracking-tight text-white">
+        <span className="text-2xl font-bold tracking-tight text-white">
             · Inmuebles V ·
         </span>
     </div>

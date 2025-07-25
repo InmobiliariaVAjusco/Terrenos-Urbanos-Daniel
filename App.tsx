@@ -1,16 +1,27 @@
+
+
 import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { Header } from './components/Header';
+import { SideBar } from './components/SideBar';
 import { Footer } from './components/Footer';
 import { PropertyList } from './components/PropertyList';
 import { SellForm } from './components/SellForm';
 import { PrivacyBanner } from './components/PrivacyBanner';
 import { ReviewsSection } from './components/ReviewsSection';
 import { LoginModal } from './components/LoginModal';
-import { Property, User, Review } from './types';
+import { LandingPage } from './components/LandingPage';
+import { PrivacyRejectionPage } from './components/PrivacyRejectionPage';
+import { PrivacyPolicyPage } from './components/PrivacyPolicyPage';
+import { RentPage } from './components/RentPage';
+import { InvestmentPage } from './components/InvestmentPage';
+import { ContactPage } from './components/ContactPage';
+import { FeaturedProperties } from './components/FeaturedProperties';
+import { UserMenu } from './components/UserMenu';
+import { Property, User, Review, PrivacyState, View } from './types';
 import { INITIAL_PROPERTIES, INITIAL_REVIEWS } from './constants';
 import { auth, firebaseInitError } from './firebase';
 
-type View = 'buy' | 'sell' | 'favorites';
+const PRIVACY_CONSENT_KEY = 'inmuebles-v-privacy-consent';
 
 const ApiKeyErrorScreen = () => (
     <div className="flex flex-col items-center justify-center min-h-screen bg-red-50 text-red-800 p-4">
@@ -21,14 +32,15 @@ const ApiKeyErrorScreen = () => (
         </div>
         <h1 className="text-3xl font-bold mb-2 text-center">Configuración Requerida</h1>
         <p className="text-lg text-center max-w-2xl">
-            Para que la aplicación funcione, es necesario configurar tu clave de API de Firebase.
+            Para que la aplicación funcione, es necesario que configures tu clave de API de Firebase.
         </p>
         <div className="mt-6 p-4 bg-red-100 rounded-lg text-left font-mono text-sm max-w-2xl w-full shadow-inner">
             <p className="font-bold">Acción requerida:</p>
             <ol className="list-decimal list-inside mt-2 space-y-2">
-                <li>Abre el archivo: <code className="bg-red-200 px-2 py-1 rounded">firebase.ts</code></li>
-                <li>Encuentra la línea que contiene el texto: <code className="bg-red-200 px-2 py-1 rounded">'DEBES_PEGAR_TU_API_KEY_DE_FIREBASE_AQUI'</code></li>
-                <li>Reemplaza ese texto con tu clave de API real desde la Consola de Firebase.</li>
+                <li>Abre el archivo <code className="bg-red-200 px-2 py-1 rounded">firebase.ts</code> en tu editor de código.</li>
+                <li>Busca la línea que dice <code className="bg-red-200 px-2 py-1 rounded">apiKey: "TU_API_KEY_AQUI"</code>.</li>
+                <li>Reemplaza <code className="bg-red-200 px-2 py-1 rounded">"TU_API_KEY_AQUI"</code> con la clave de API real de tu proyecto de Firebase.</li>
+                <li>Guarda el archivo. La aplicación debería funcionar correctamente.</li>
             </ol>
         </div>
     </div>
@@ -56,24 +68,32 @@ const FirebaseInitErrorScreen = ({ error }: { error: Error }) => (
 );
 
 function App() {
-  const [view, setView] = useState<View>('buy');
+  const [showLandingPage, setShowLandingPage] = useState(true);
+  const [privacyState, setPrivacyState] = useState<PrivacyState>('pending');
+  const [view, setView] = useState<View>('home');
   const [properties, setProperties] = useState<Property[]>(INITIAL_PROPERTIES);
   const [reviews, setReviews] = useState<Review[]>(INITIAL_REVIEWS);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [favorites, setFavorites] = useState<number[]>([]);
   const [isLoginModalOpen, setLoginModalOpen] = useState(false);
   const [isLoadingAuth, setIsLoadingAuth] = useState(true);
+  const [isSidebarOpen, setSidebarOpen] = useState(false);
 
-  // Sistema de verificación robusto para la inicialización de Firebase.
   if (firebaseInitError) {
     if (firebaseInitError.message === "API_KEY_MISSING") {
       return <ApiKeyErrorScreen />;
     }
     return <FirebaseInitErrorScreen error={firebaseInitError} />;
   }
+  
+  useEffect(() => {
+    const savedState = localStorage.getItem(PRIVACY_CONSENT_KEY);
+    if (savedState === 'accepted') {
+        setPrivacyState('accepted');
+    }
+  }, []);
 
   useEffect(() => {
-    // Como firebaseInitError es nulo, podemos asumir que 'auth' está disponible.
     const unsubscribe = auth.onAuthStateChanged(user => {
       if (user) {
         setCurrentUser({
@@ -93,9 +113,23 @@ function App() {
     return () => unsubscribe();
   }, []);
 
+  const handleAcceptPrivacy = useCallback(() => {
+    localStorage.setItem(PRIVACY_CONSENT_KEY, 'accepted');
+    setPrivacyState('accepted');
+  }, []);
+
+  const handleRejectPrivacy = useCallback(() => {
+    setPrivacyState('rejected');
+  }, []);
+
+  const handleResetToLanding = useCallback(() => {
+    setPrivacyState('pending');
+    setShowLandingPage(true);
+  }, []);
+
   const handleLogout = useCallback(() => {
     auth.signOut();
-    setView('buy'); // Go back to the main view on logout
+    setView('buy');
   }, []);
   
   const handleToggleFavorite = useCallback((id: number) => {
@@ -116,19 +150,35 @@ function App() {
       publicationDate: new Date().toISOString(),
     };
     setProperties(prevProperties => [propertyToAdd, ...prevProperties]);
-    setView('buy'); // Switch back to buy view after adding
+    setView('buy');
   }, []);
   
-  const handleAddReview = useCallback((newReview: Omit<Review, 'id' | 'author' | 'avatarUrl'>) => {
+  const handleAddReview = useCallback((newReview: Omit<Review, 'id' | 'author' | 'avatarUrl' | 'userId' | 'date'>) => {
     if(!currentUser) return;
     const reviewToAdd: Review = {
         ...newReview,
         id: Date.now(),
         author: currentUser.displayName || 'Anónimo',
-        avatarUrl: currentUser.photoURL || `https://i.pravatar.cc/150?u=${currentUser.uid}`
+        avatarUrl: currentUser.photoURL || `https://i.pravatar.cc/150?u=${currentUser.uid}`,
+        userId: currentUser.uid,
+        date: new Date().toISOString()
     }
     setReviews(prev => [reviewToAdd, ...prev]);
   }, [currentUser]);
+
+  const handleDeleteReview = useCallback((reviewId: number) => {
+      if (!currentUser) return;
+      
+      const reviewToDelete = reviews.find(r => r.id === reviewId);
+      if (reviewToDelete?.userId !== currentUser.uid) {
+          console.error("Acción no permitida: No puedes borrar la reseña de otro usuario.");
+          return;
+      }
+      
+      if (window.confirm('¿Estás seguro de que quieres eliminar tu opinión? Esta acción no se puede deshacer.')) {
+          setReviews(prev => prev.filter(review => review.id !== reviewId));
+      }
+  }, [currentUser, reviews]);
 
   const handleViewChange = useCallback((newView: View) => {
     if (newView === 'favorites' && !currentUser) {
@@ -136,11 +186,51 @@ function App() {
     } else {
         setView(newView);
     }
+    setSidebarOpen(false); // Close sidebar on navigation
   }, [currentUser]);
+  
+  const handleEnterApp = () => {
+    setShowLandingPage(false);
+  };
+  
+  const toggleSidebar = () => {
+      setSidebarOpen(prev => !prev);
+  }
 
   const favoriteProperties = useMemo(() => {
     return properties.filter(p => favorites.includes(p.id));
   }, [properties, favorites]);
+  
+  const renderContent = () => {
+    switch (view) {
+        case 'home':
+             return <FeaturedProperties properties={properties} onToggleFavorite={handleToggleFavorite} favorites={favorites} />;
+        case 'buy':
+            return <PropertyList properties={properties} onToggleFavorite={handleToggleFavorite} favorites={favorites} />;
+        case 'sell':
+            return <SellForm onAddProperty={handleAddProperty} />;
+        case 'favorites':
+            return <PropertyList title="Mis Favoritos" properties={favoriteProperties} onToggleFavorite={handleToggleFavorite} favorites={favorites} />;
+        case 'rent':
+            return <RentPage />;
+        case 'investment':
+            return <InvestmentPage />;
+        case 'contact':
+            return <ContactPage />;
+        case 'privacy':
+            return <PrivacyPolicyPage />;
+        default:
+            return <PropertyList properties={properties} onToggleFavorite={handleToggleFavorite} favorites={favorites} />;
+    }
+  };
+
+  if (showLandingPage) {
+    return <LandingPage onEnter={handleEnterApp} />;
+  }
+
+  if (privacyState === 'rejected') {
+    return <PrivacyRejectionPage onReset={handleResetToLanding} />;
+  }
 
   if (isLoadingAuth) {
     return (
@@ -151,27 +241,49 @@ function App() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-white font-sans text-slate-800">
-      <Header 
-        currentView={view} 
+    <div className="bg-white font-sans text-slate-800 relative min-h-screen">
+      <SideBar
+        currentView={view}
         onViewChange={handleViewChange}
-        currentUser={currentUser}
-        onLogout={handleLogout}
-        onLoginClick={() => setLoginModalOpen(true)}
+        isOpen={isSidebarOpen}
+        onClose={toggleSidebar}
       />
-      <main className="flex-grow container mx-auto px-4 py-8">
-        {view === 'buy' && <PropertyList properties={properties} onToggleFavorite={handleToggleFavorite} favorites={favorites} />}
-        {view === 'sell' && <SellForm onAddProperty={handleAddProperty} />}
-        {view === 'favorites' && <PropertyList title="Mis Favoritos" properties={favoriteProperties} onToggleFavorite={handleToggleFavorite} favorites={favorites} />}
-      </main>
-      <ReviewsSection 
-        reviews={reviews}
-        currentUser={currentUser}
-        onAddReview={handleAddReview}
-        onLoginRequest={() => setLoginModalOpen(true)}
-      />
-      <Footer />
-      <PrivacyBanner />
+      
+      {/* Overlay for when sidebar is open */}
+      {isSidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black/60 z-40 transition-opacity duration-300"
+          onClick={toggleSidebar}
+          aria-hidden="true"
+        ></div>
+      )}
+
+      <div className="flex flex-col min-h-screen">
+        <Header 
+            onMenuClick={toggleSidebar}
+            currentUser={currentUser}
+            onLogout={handleLogout}
+            onLoginClick={() => setLoginModalOpen(true)}
+            onShowFavorites={() => handleViewChange('favorites')}
+        />
+        <main className="flex-grow container mx-auto px-4 py-8">
+            {renderContent()}
+        </main>
+        <div className="mt-auto">
+            <ReviewsSection 
+                reviews={reviews}
+                currentUser={currentUser}
+                onAddReview={handleAddReview}
+                onDeleteReview={handleDeleteReview}
+                onLoginRequest={() => setLoginModalOpen(true)}
+            />
+            <Footer />
+        </div>
+      </div>
+      
+      {privacyState === 'pending' && (
+        <PrivacyBanner onAccept={handleAcceptPrivacy} onReject={handleRejectPrivacy} />
+      )}
       <LoginModal 
         isOpen={isLoginModalOpen}
         onClose={() => setLoginModalOpen(false)}

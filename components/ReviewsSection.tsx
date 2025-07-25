@@ -7,11 +7,12 @@ import { ReviewForm } from './ReviewForm';
 interface ReviewsSectionProps {
   reviews: Review[];
   currentUser: User | null;
-  onAddReview: (review: Omit<Review, 'id' | 'author' | 'avatarUrl'>) => void;
+  onAddReview: (review: Omit<Review, 'id' | 'author' | 'avatarUrl' | 'userId' | 'date'>) => void;
+  onDeleteReview: (reviewId: number) => void;
   onLoginRequest: () => void;
 }
 
-export const ReviewsSection: React.FC<ReviewsSectionProps> = ({ reviews, currentUser, onAddReview, onLoginRequest }) => {
+export const ReviewsSection: React.FC<ReviewsSectionProps> = ({ reviews, currentUser, onAddReview, onDeleteReview, onLoginRequest }) => {
   return (
     <section className="bg-slate-50 py-16 mt-8">
       <div className="container mx-auto px-4">
@@ -39,7 +40,12 @@ export const ReviewsSection: React.FC<ReviewsSectionProps> = ({ reviews, current
 
           <div className="space-y-8">
             {reviews.map(review => (
-              <ReviewCard key={review.id} review={review} />
+              <ReviewCard 
+                key={review.id} 
+                review={review}
+                currentUser={currentUser}
+                onDelete={onDeleteReview}
+              />
             ))}
           </div>
         </div>

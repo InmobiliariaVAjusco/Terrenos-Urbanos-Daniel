@@ -5,7 +5,7 @@ import { InteractiveStarRating } from './InteractiveStarRating';
 
 interface ReviewFormProps {
   currentUser: User;
-  onAddReview: (review: Omit<Review, 'id' | 'author' | 'avatarUrl'>) => void;
+  onAddReview: (review: Omit<Review, 'id' | 'author' | 'avatarUrl' | 'userId' | 'date'>) => void;
 }
 
 export const ReviewForm: React.FC<ReviewFormProps> = ({ currentUser, onAddReview }) => {

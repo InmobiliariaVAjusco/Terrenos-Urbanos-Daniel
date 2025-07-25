@@ -1,45 +1,36 @@
-import React, { useState, useEffect } from 'react';
 
-const PRIVACY_STORAGE_KEY = 'inmuebles-v-privacy-accepted';
+import React from 'react';
 
-export const PrivacyBanner: React.FC = () => {
-  const [isVisible, setIsVisible] = useState(false);
+interface PrivacyBannerProps {
+  onAccept: () => void;
+  onReject: () => void;
+}
 
-  useEffect(() => {
-    const hasAccepted = localStorage.getItem(PRIVACY_STORAGE_KEY);
-    if (!hasAccepted) {
-      // Use a small delay to ensure the banner doesn't feel too abrupt on page load
-      const timer = setTimeout(() => {
-        setIsVisible(true);
-      }, 500);
-      return () => clearTimeout(timer);
-    }
-  }, []);
-
-  const handleAccept = () => {
-    localStorage.setItem(PRIVACY_STORAGE_KEY, 'true');
-    setIsVisible(false);
-  };
-
-  if (!isVisible) {
-    return null;
-  }
-
+export const PrivacyBanner: React.FC<PrivacyBannerProps> = ({ onAccept, onReject }) => {
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-slate-900/95 backdrop-blur-sm text-white p-4 shadow-lg z-50 animate-slide-up" role="alert" aria-live="polite">
+    <div className="fixed bottom-0 left-0 right-0 bg-slate-900/95 backdrop-blur-sm text-white p-4 shadow-lg z-50 animate-slide-up" role="alertdialog" aria-live="polite" aria-label="Aviso de Privacidad">
       <div className="container mx-auto flex flex-col md:flex-row items-center justify-center gap-4">
-        <div className="text-sm text-slate-200 text-center md:text-left">
+        <div className="text-sm text-slate-200 text-center md:text-left flex-grow">
           <p>
-            <strong className="font-semibold text-white">Aviso de Privacidad:</strong> Al registrar sus datos o navegar en nuestro sitio, usted acepta que · Inmuebles V · puede utilizar su información de contacto (correo electrónico, WhatsApp) para enviarle comunicaciones sobre oportunidades de inversión y nuevos listados. Respetamos su privacidad.
+            <strong className="font-semibold text-white">Aviso de Privacidad:</strong> Usamos información de contacto y cookies para mejorar tu experiencia. Al aceptar, consientes nuestro uso de datos para mostrarte oportunidades relevantes.
           </p>
         </div>
-        <button
-          onClick={handleAccept}
-          className="bg-green-600 hover:bg-green-500 text-white font-bold py-2 px-6 rounded-md transition-colors duration-300 flex-shrink-0 w-full md:w-auto"
-          aria-label="Aceptar y cerrar el aviso de privacidad"
-        >
-          Entendido
-        </button>
+        <div className="flex-shrink-0 flex items-center gap-3 w-full md:w-auto">
+          <button
+            onClick={onReject}
+            className="bg-transparent hover:bg-slate-700/80 text-slate-200 font-bold py-2 px-6 rounded-md transition-colors duration-300 w-1/2 md:w-auto"
+            aria-label="Rechazar políticas de privacidad"
+          >
+            Rechazar
+          </button>
+          <button
+            onClick={onAccept}
+            className="bg-green-600 hover:bg-green-500 text-white font-bold py-2 px-6 rounded-md transition-colors duration-300 w-1/2 md:w-auto"
+            aria-label="Aceptar políticas de privacidad"
+          >
+            Aceptar
+          </button>
+        </div>
       </div>
       <style>{`
         @keyframes slide-up {

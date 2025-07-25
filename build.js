@@ -14,7 +14,7 @@ async function build() {
 
     // 2. Copy static assets (like index.html) to the output directory.
     await fs.copyFile('index.html', path.join(outdir, 'index.html'));
-
+    
     // 3. Run esbuild to bundle and transpile TypeScript/React code.
     const result = await esbuild.build({
       entryPoints: ['index.tsx'],
