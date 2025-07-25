@@ -3,9 +3,10 @@
   "name": "inmuebles-v-static-site",
   "version": "1.0.0",
   "private": true,
+  "type": "module",
   "description": "Plataforma de compra-venta de inmuebles que utiliza React. Este package.json está configurado para transpilar TypeScript con esbuild para Vercel.",
   "scripts": {
-    "build": "mkdir -p dist && cp index.html dist/ && esbuild index.tsx --bundle --outfile=dist/index.js --format=esm --external:react --external:react-dom/client --external:@google/genai"
+    "build": "node build.js"
   },
   "dependencies": {},
   "devDependencies": {
