@@ -50,6 +50,14 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
         case 'auth/popup-closed-by-user':
             setError('');
             break;
+        case 'auth/unauthorized-domain':
+            setError('El dominio de esta página no está autorizado. Agrégalo en tu configuración de Firebase Authentication.');
+            console.error("Firebase auth error: Domain not authorized. Add the current URL to the Firebase Console > Authentication > Settings > Authorized domains.");
+            break;
+        case 'auth/operation-not-allowed':
+             setError('El inicio de sesión con este método no está habilitado. Actívalo en tu consola de Firebase.');
+             console.error("Firebase auth error: Sign-in method is not enabled in the Firebase Console.");
+             break;
         default:
             setError('Ocurrió un error inesperado. Inténtalo de nuevo.');
             console.error("Firebase auth error:", err);
