@@ -1,16 +1,30 @@
-export type LandUse = 'Residencial' | 'Comercial' | 'Mixto';
+export type PropertyType = 'Residencial' | 'Comercial' | 'Mixto';
 
-export interface LandPlot {
+export interface Property {
   id: number;
   address: string;
   price: number;
   sqft: number;
   frontage: number; // Frente en metros
   depth: number; // Fondo en metros
-  landUse: LandUse;
-  image: string;
+  propertyType: PropertyType;
+  images: string[];
   description: string;
   services: string[]; // e.g. ['Agua', 'Luz', 'Drenaje']
   publicationDate: string; // ISO 8601 date string
-  isFavorite: boolean;
+}
+
+export interface Review {
+  id: number;
+  author: string;
+  avatarUrl: string;
+  rating: number; // e.g., 4 or 5
+  text: string;
+}
+
+export interface User {
+  uid: string;
+  displayName: string | null;
+  email: string | null;
+  photoURL: string | null;
 }

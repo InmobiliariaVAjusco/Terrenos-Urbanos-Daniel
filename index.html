@@ -3,37 +3,35 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Terrenos Urbanos Ajusco | Bienes Raíces Daniel</title>
+    <title>· Inmuebles V · | Ajusco Tlalpan CDMX</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏠</text></svg>">
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Firebase Libraries (Método de Carga Robusto) -->
+    <script defer src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    
     <style>
-      /* Simple scrollbar styling for a more modern look */
-      ::-webkit-scrollbar {
-        width: 8px;
-      }
-      ::-webkit-scrollbar-track {
-        background: #f1f1f1;
-      }
-      ::-webkit-scrollbar-thumb {
-        background: #888;
-        border-radius: 4px;
-      }
-      ::-webkit-scrollbar-thumb:hover {
-        background: #555;
-      }
+      /* Estilo simple de la barra de desplazamiento */
+      ::-webkit-scrollbar { width: 8px; }
+      ::-webkit-scrollbar-track { background: #f1f1f1; }
+      ::-webkit-scrollbar-thumb { background: #888; border-radius: 4px; }
+      ::-webkit-scrollbar-thumb:hover { background: #555; }
     </style>
-  <script type="importmap">
+    
+    <!-- Import Map Limpio y Estable para React 19 -->
+    <script type="importmap">
 {
   "imports": {
-    "react/": "https://esm.sh/react@^19.1.0/",
-    "react": "https://esm.sh/react@^19.1.0",
+    "react": "https://esm.sh/react@^19.0.0",
+    "react-dom/client": "https://esm.sh/react-dom@^19.0.0/client",
     "react-dom/": "https://esm.sh/react-dom@^19.1.0/",
-    "@google/genai": "https://esm.sh/@google/genai",
+    "react/": "https://esm.sh/react@^19.1.0/",
     "react-dom": "https://esm.sh/react-dom@^19.1.0"
   }
 }
 </script>
-<link rel="stylesheet" href="/index.css">
+  <link rel="stylesheet" href="/index.css">
 </head>
   <body class="bg-white">
     <div id="root"></div>
