@@ -5,7 +5,7 @@
   "private": true,
   "description": "Plataforma de compra-venta de inmuebles que utiliza React. Este package.json está configurado para transpilar TypeScript con esbuild para Vercel.",
   "scripts": {
-    "build": "esbuild index.tsx --bundle --outfile=dist/index.js --format=esm --external:react --external:react-dom/client --external:@google/genai && cp index.html dist/ && cp -r public/* dist/ 2>/dev/null || :"
+    "build": "mkdir -p dist && cp index.html dist/ && esbuild index.tsx --bundle --outfile=dist/index.js --format=esm --external:react --external:react-dom/client --external:@google/genai"
   },
   "dependencies": {},
   "devDependencies": {
