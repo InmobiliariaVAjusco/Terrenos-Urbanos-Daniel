@@ -5,7 +5,7 @@
   "private": true,
   "description": "Plataforma de compra-venta de inmuebles que utiliza React con un setup sin bundler (import maps). Este package.json es para compatibilidad con Vercel.",
   "scripts": {
-    "build": "echo 'No se requiere paso de compilación. Vercel servirá los archivos estáticos directamente.'"
+    "build": "mkdir dist && cp -r App.tsx components constants.ts firebase.ts index.html index.tsx metadata.json types.ts dist"
   },
   "dependencies": {},
   "devDependencies": {}
