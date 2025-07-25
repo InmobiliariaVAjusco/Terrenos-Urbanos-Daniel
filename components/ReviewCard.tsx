@@ -6,7 +6,7 @@ import { StarRating } from './StarRating';
 interface ReviewCardProps {
   review: Review;
   currentUser: User | null;
-  onDelete: (id: number) => void;
+  onDelete: (id: string) => void;
 }
 
 // Helper to format date

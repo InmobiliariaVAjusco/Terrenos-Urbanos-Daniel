@@ -1,5 +1,4 @@
 
-
 import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { Header } from './components/Header';
 import { SideBar } from './components/SideBar';
@@ -19,9 +18,14 @@ import { FeaturedProperties } from './components/FeaturedProperties';
 import { UserMenu } from './components/UserMenu';
 import { Property, User, Review, PrivacyState, View } from './types';
 import { INITIAL_PROPERTIES, INITIAL_REVIEWS } from './constants';
-import { auth, firebaseInitError } from './firebase';
+import { auth, db, firebaseInitError } from './firebase';
 
 const PRIVACY_CONSENT_KEY = 'inmuebles-v-privacy-consent';
+
+// Define a type for a simple, serializable error object.
+type SimpleError = { message: string; name: string; code?: string; };
+type ConnectionStatus = 'connecting' | 'online' | 'offline';
+
 
 const ApiKeyErrorScreen = () => (
     <div className="flex flex-col items-center justify-center min-h-screen bg-red-50 text-red-800 p-4">
@@ -46,7 +50,7 @@ const ApiKeyErrorScreen = () => (
     </div>
 );
 
-const FirebaseInitErrorScreen = ({ error }: { error: Error }) => (
+const FirebaseInitErrorScreen = ({ error }: { error: SimpleError }) => (
     <div className="flex flex-col items-center justify-center min-h-screen bg-orange-50 text-orange-800 p-4">
         <div className="w-16 h-16 text-orange-500 mb-4">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
@@ -67,6 +71,7 @@ const FirebaseInitErrorScreen = ({ error }: { error: Error }) => (
     </div>
 );
 
+
 function App() {
   const [showLandingPage, setShowLandingPage] = useState(true);
   const [privacyState, setPrivacyState] = useState<PrivacyState>('pending');
@@ -78,6 +83,7 @@ function App() {
   const [isLoginModalOpen, setLoginModalOpen] = useState(false);
   const [isLoadingAuth, setIsLoadingAuth] = useState(true);
   const [isSidebarOpen, setSidebarOpen] = useState(false);
+  const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>('connecting');
 
   if (firebaseInitError) {
     if (firebaseInitError.message === "API_KEY_MISSING") {
@@ -91,6 +97,42 @@ function App() {
     if (savedState === 'accepted') {
         setPrivacyState('accepted');
     }
+  }, []);
+
+  useEffect(() => {
+    if (!db) {
+      setConnectionStatus('offline');
+      return;
+    }; 
+
+    const unsubscribe = db.collection('reviews')
+      .orderBy('date', 'desc')
+      .onSnapshot((querySnapshot: any) => {
+        setConnectionStatus('online'); // Successful connection
+        const reviewsData: Review[] = querySnapshot.docs.map((doc: any) => {
+          const data = doc.data();
+          const { author, avatarUrl, rating, text, userId, date } = data;
+          return {
+            id: doc.id,
+            author,
+            avatarUrl,
+            rating,
+            text,
+            userId,
+            date: date?.toDate ? date.toDate().toISOString() : date,
+          };
+        });
+        setReviews(reviewsData);
+      }, (error: any) => {
+        console.error(
+          "Error de conexión con Firestore. La aplicación funcionará en 'Modo Demo'. " +
+          "Revisa la guía en README.md: API key, dominios autorizados y reglas de Firestore."
+        );
+        console.log("Raw Firebase error object:", error);
+        setConnectionStatus('offline');
+      });
+
+    return () => unsubscribe();
   }, []);
 
   useEffect(() => {
@@ -153,20 +195,34 @@ function App() {
     setView('buy');
   }, []);
   
-  const handleAddReview = useCallback((newReview: Omit<Review, 'id' | 'author' | 'avatarUrl' | 'userId' | 'date'>) => {
+  const handleAddReview = useCallback(async (newReview: Omit<Review, 'id' | 'author' | 'avatarUrl' | 'userId' | 'date'>) => {
     if(!currentUser) return;
-    const reviewToAdd: Review = {
+
+    const commonReviewData = {
         ...newReview,
-        id: Date.now(),
         author: currentUser.displayName || 'Anónimo',
         avatarUrl: currentUser.photoURL || `https://i.pravatar.cc/150?u=${currentUser.uid}`,
         userId: currentUser.uid,
-        date: new Date().toISOString()
-    }
-    setReviews(prev => [reviewToAdd, ...prev]);
-  }, [currentUser]);
+    };
 
-  const handleDeleteReview = useCallback((reviewId: number) => {
+    if (connectionStatus === 'online' && db) {
+        try {
+            await db.collection('reviews').add({ ...commonReviewData, date: new Date() });
+        } catch(error) {
+            console.error("Error al añadir la reseña (Firestore): ", error);
+        }
+    } else {
+        // Offline/Demo mode: add to local state
+        const localReview: Review = {
+            ...commonReviewData,
+            id: `local-${Date.now().toString()}`,
+            date: new Date().toISOString()
+        };
+        setReviews(prevReviews => [localReview, ...prevReviews]);
+    }
+  }, [currentUser, connectionStatus]);
+
+  const handleDeleteReview = useCallback(async (reviewId: string) => {
       if (!currentUser) return;
       
       const reviewToDelete = reviews.find(r => r.id === reviewId);
@@ -176,9 +232,18 @@ function App() {
       }
       
       if (window.confirm('¿Estás seguro de que quieres eliminar tu opinión? Esta acción no se puede deshacer.')) {
-          setReviews(prev => prev.filter(review => review.id !== reviewId));
+        if (connectionStatus === 'online' && db) {
+             try {
+                await db.collection('reviews').doc(reviewId).delete();
+            } catch (error) {
+                console.error("Error al eliminar la reseña (Firestore): ", error);
+            }
+        } else {
+             // Offline/Demo mode: remove from local state
+             setReviews(prevReviews => prevReviews.filter(r => r.id !== reviewId));
+        }
       }
-  }, [currentUser, reviews]);
+  }, [currentUser, reviews, connectionStatus]);
 
   const handleViewChange = useCallback((newView: View) => {
     if (newView === 'favorites' && !currentUser) {
@@ -276,6 +341,7 @@ function App() {
                 onAddReview={handleAddReview}
                 onDeleteReview={handleDeleteReview}
                 onLoginRequest={() => setLoginModalOpen(true)}
+                connectionStatus={connectionStatus}
             />
             <Footer />
         </div>

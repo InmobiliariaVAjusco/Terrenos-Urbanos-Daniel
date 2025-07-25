@@ -1,3 +1,4 @@
+
 import { Property, Review } from './types';
 
 // Helper to get past dates for more realistic data
@@ -90,30 +91,21 @@ export const INITIAL_PROPERTIES: Property[] = [
 
 export const INITIAL_REVIEWS: Review[] = [
   {
-    id: 1,
-    author: 'Familia Hernández',
-    avatarUrl: `https://i.pravatar.cc/150?u=familia-hernandez`,
+    id: 'demo-1',
+    author: 'Carlos Mendoza',
+    avatarUrl: 'https://i.pravatar.cc/150?u=carlos',
     rating: 5,
-    text: 'El proceso fue increíblemente fácil y transparente. Encontramos el inmueble perfecto para construir nuestra casa. ¡Totalmente recomendados!',
-    userId: 'user-id-placeholder-1',
+    text: '¡El servicio fue excepcional! Encontraron el terreno perfecto para mi familia en tiempo récord. Totalmente recomendados.',
+    userId: 'demo-user-1',
     date: getPastDate(7),
   },
   {
-    id: 2,
-    author: 'Carlos Gutiérrez',
-    avatarUrl: `https://i.pravatar.cc/150?u=carlos-gutierrez`,
+    id: 'demo-2',
+    author: 'Ana Sofía Rodríguez',
+    avatarUrl: 'https://i.pravatar.cc/150?u=anasofia',
     rating: 5,
-    text: 'Gran atención y profesionalismo. Me ayudaron a vender mi propiedad rápidamente y a un excelente precio. El equipo conoce muy bien la zona del Ajusco.',
-    userId: 'user-id-placeholder-2',
-    date: getPastDate(15),
-  },
-  {
-    id: 3,
-    author: 'Sofía Morales',
-    avatarUrl: `https://i.pravatar.cc/150?u=sofia-morales`,
-    rating: 5,
-    text: 'Como inversionista, valoro la eficiencia. · Inmuebles V · me presentó las mejores oportunidades comerciales. Sin duda volveré a trabajar con ellos.',
-    userId: 'user-id-placeholder-3',
-    date: getPastDate(28),
+    text: 'Pusimos nuestro inmueble en venta y el proceso fue transparente y muy profesional. La plataforma es muy fácil de usar.',
+    userId: 'demo-user-2',
+    date: getPastDate(22),
   },
 ];

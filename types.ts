@@ -16,7 +16,7 @@ export interface Property {
 }
 
 export interface Review {
-  id: number;
+  id: string;
   author: string;
   avatarUrl: string;
   rating: number; // e.g., 4 or 5

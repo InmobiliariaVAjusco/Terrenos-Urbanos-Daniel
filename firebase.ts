@@ -1,3 +1,4 @@
+
 // Declara que la variable 'firebase' existirá globalmente
 declare const firebase: any;
 
@@ -5,7 +6,7 @@ declare const firebase: any;
 // ¡IMPORTANTE! Pega aquí tu clave de API de Firebase.
 export const firebaseConfig = {
   // REEMPLAZA "TU_API_KEY_AQUI" CON TU CLAVE DE API REAL DE FIREBASE
-  apiKey: "AIzaSyCcU2CbpSkVSVfHIAOvePo7fjlJSRtVjgA", 
+  apiKey: "AIzaSyCcU2CbpSkVSVfHIAOvePo7fjlJSRtVjgA", // <-- ¡MUY IMPORTANTE!
   authDomain: "inmuebles-v.firebaseapp.com",
   projectId: "inmuebles-v",
   storageBucket: "inmuebles-v.appspot.com",
@@ -16,7 +17,8 @@ export const firebaseConfig = {
 
 let authInstance: any = null;
 let googleProviderInstance: any = null;
-let initializationError: Error | null = null;
+let firestoreInstance: any = null;
+let initializationError: { message: string; name: string; code?: string; } | null = null;
 
 try {
   // Primero, verificar si el script de Firebase se cargó
@@ -35,6 +37,7 @@ try {
 
   // Finalmente, exportar los servicios
   authInstance = firebase.auth();
+  firestoreInstance = firebase.firestore();
   
   // Se establece explícitamente la persistencia a 'local'.
   // Esto soluciona errores en entornos donde la detección automática de almacenamiento puede fallar
@@ -48,11 +51,17 @@ try {
 
 } catch (e: any) {
   console.error("Firebase initialization failed:", e);
-  initializationError = e;
+  // Immediately create a simple, serializable object from the error to prevent circular reference issues.
+  initializationError = {
+    message: e.message || 'Error de inicialización de Firebase desconocido.',
+    name: e.name || 'InitializationError',
+    code: e.code,
+  };
 }
 
 
 // Exporta los servicios y el posible error de inicialización
 export const auth = authInstance;
+export const db = firestoreInstance;
 export const GoogleAuthProvider = googleProviderInstance;
 export const firebaseInitError = initializationError;
