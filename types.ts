@@ -1,5 +1,15 @@
 
-export type PropertyType = 'Residencial' | 'Comercial' | 'Mixto';
+export type ListingType = 'Venta' | 'Renta';
+
+export type PropertyCategory = 
+  | 'Casa' 
+  | 'Departamento' 
+  | 'Terreno' 
+  | 'Rancho' 
+  | 'Casa en condominio' 
+  | 'Casa con terreno' 
+  | 'Comercial' 
+  | 'Mixto';
 
 export interface Property {
   id: string;
@@ -8,12 +18,16 @@ export interface Property {
   sqft: number;
   frontage: number; // Frente en metros
   depth: number; // Fondo en metros
-  propertyType: PropertyType;
+  category: PropertyCategory;
+  listingType: ListingType;
   images: string[];
   description: string;
   services: string[]; // e.g. ['Agua', 'Luz', 'Drenaje']
   publicationDate: string; // ISO 8601 date string
   isFeatured?: boolean; // <-- Campo para destacar en el carrusel
+  rooms?: number;
+  bathrooms?: number;
+  mainFeatures: [string, string, string];
 }
 
 export interface Review {

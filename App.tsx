@@ -10,7 +10,6 @@ import { LoginModal } from './components/LoginModal';
 import { LandingPage } from './components/LandingPage';
 import { PrivacyRejectionPage } from './components/PrivacyRejectionPage';
 import { PrivacyPolicyPage } from './components/PrivacyPolicyPage';
-import { RentPage } from './components/RentPage';
 import { InvestmentPage } from './components/InvestmentPage';
 import { ContactPage } from './components/ContactPage';
 import { FeaturedProperties } from './components/FeaturedProperties';
@@ -78,6 +77,7 @@ const App = () => {
     const [properties, setProperties] = useState<Property[]>([]);
     const [reviews, setReviews] = useState<Review[]>(INITIAL_REVIEWS);
     const [favorites, setFavorites] = useState<string[]>([]);
+    const [animationClass, setAnimationClass] = useState('');
     
     // State for UI controls
     const [isSidebarOpen, setSidebarOpen] = useState(false);
@@ -217,10 +217,20 @@ const App = () => {
     };
     
     const handleViewChange = useCallback((view: View) => {
-        setCurrentView(view);
+        if (view === currentView) {
+            setSidebarOpen(false);
+            return;
+        }
+
+        setAnimationClass('animate-page-exit');
         setSidebarOpen(false);
-        window.scrollTo(0, 0);
-    }, []);
+
+        setTimeout(() => {
+            setCurrentView(view);
+            window.scrollTo(0, 0);
+            setAnimationClass('animate-page-enter');
+        }, 300); // Duration must match the CSS exit animation
+    }, [currentView]);
 
     const handleLogout = useCallback(async () => {
         if (!auth) return;
@@ -276,6 +286,9 @@ const App = () => {
     // --- Memos for derived data ---
     const featuredProperties = useMemo(() => properties.filter(p => p.isFeatured), [properties]);
     const favoriteProperties = useMemo(() => properties.filter(p => favorites.includes(p.id)), [properties, favorites]);
+    const saleProperties = useMemo(() => properties.filter(p => p.listingType === 'Venta'), [properties]);
+    const rentProperties = useMemo(() => properties.filter(p => p.listingType === 'Renta'), [properties]);
+
 
     // --- Render Logic ---
     // Check for critical errors first.
@@ -295,9 +308,6 @@ const App = () => {
     // --- Main App Render ---
     // This will only render if appState is 'main' and privacy is not rejected.
     
-    // A watermark for the test version
-    const watermark = <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-red-500/10 text-[15vw] font-black pointer-events-none z-[1000] rotate-[-15deg]">Version de prueba</div>;
-
     let content;
     switch (currentView) {
         case 'home':
@@ -310,7 +320,10 @@ const App = () => {
             );
             break;
         case 'buy':
-            content = <PropertyList properties={properties} onToggleFavorite={handleToggleFavorite} favorites={favorites} />;
+            content = <PropertyList properties={saleProperties} onToggleFavorite={handleToggleFavorite} favorites={favorites} title="Propiedades en Venta" />;
+            break;
+        case 'rent':
+            content = <PropertyList properties={rentProperties} onToggleFavorite={handleToggleFavorite} favorites={favorites} title="Propiedades en Renta" />;
             break;
         case 'favorites':
             content = <PropertyList properties={favoriteProperties} onToggleFavorite={handleToggleFavorite} favorites={favorites} title="Mis Favoritos" />;
@@ -320,9 +333,6 @@ const App = () => {
              break;
         case 'privacy':
             content = <PrivacyPolicyPage />;
-            break;
-        case 'rent':
-            content = <RentPage />;
             break;
         case 'investment':
             content = <InvestmentPage />;
@@ -336,11 +346,10 @@ const App = () => {
 
     return (
         <div className="flex flex-col min-h-screen bg-slate-50 relative">
-            {watermark}
             <Header onMenuClick={() => setSidebarOpen(true)} currentUser={currentUser} onLogout={handleLogout} onLoginClick={() => setLoginModalOpen(true)} onViewChange={handleViewChange} />
             <SideBar isOpen={isSidebarOpen} onClose={() => setSidebarOpen(false)} currentView={currentView} onViewChange={handleViewChange} />
 
-            <main className="container mx-auto px-4 py-8 flex-grow">
+            <main className={`container mx-auto px-4 py-8 flex-grow ${animationClass}`}>
                 {content}
             </main>
 

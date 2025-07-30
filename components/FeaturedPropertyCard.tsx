@@ -21,6 +21,8 @@ export const FeaturedPropertyCard: React.FC<FeaturedPropertyCardProps> = ({ prop
     e.stopPropagation(); // Prevent modal from opening
     onToggleFavorite(property.id);
   };
+  
+  const bannerText = `${property.category} en ${property.listingType}`;
 
   return (
     <div className="w-full h-full relative cursor-pointer" onClick={() => onSelect(property)}>
@@ -31,6 +33,12 @@ export const FeaturedPropertyCard: React.FC<FeaturedPropertyCardProps> = ({ prop
       />
       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
       
+      <div className="absolute top-0 left-0 p-8 w-full">
+         <div className="px-3 py-1.5 bg-slate-800/80 backdrop-blur-sm text-white font-bold text-sm rounded-full shadow-lg uppercase tracking-wider inline-block">
+            {bannerText}
+        </div>
+      </div>
+
       <div className="absolute bottom-0 left-0 p-8 text-white w-full">
          <div className="flex justify-between items-end">
              <div>

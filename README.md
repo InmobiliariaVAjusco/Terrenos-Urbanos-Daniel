@@ -1,4 +1,3 @@
-
 # · Inmuebles V · | Plataforma de Bienes Raíces
 
 Esta es una plataforma moderna para la compra y venta de inmuebles, construida con React, TypeScript y Firebase. Utiliza una arquitectura estática optimizada para un despliegue rápido y seguro en plataformas como Vercel.
@@ -60,18 +59,17 @@ API_KEY="tu-api-key-aqui" npm run build
 
 4.  **Configurar las Reglas de Seguridad:**
     *   Una vez creada la base de datos, ve a la pestaña **Reglas**.
-    *   Reemplaza todo el contenido con las siguientes reglas. Esto permite que cualquiera lea las propiedades y las opiniones, pero solo los usuarios autenticados pueden escribir sus propias reseñas. La escritura de propiedades está deshabilitada para los clientes.
+    *   Reemplaza todo el contenido con las siguientes reglas. Esto permite que cualquiera lea las propiedades y las opiniones. Solo los usuarios autenticados pueden escribir propiedades (desde un panel de administrador) y sus propias reseñas.
 
     ```
     rules_version = '2';
     service cloud.firestore {
       match /databases/{database}/documents {
         
-        // Propiedades: Solo lectura para clientes.
-        // La escritura debe ser manejada por un backend o panel de admin con credenciales privilegiadas.
+        // Propiedades: Lectura para todos, escritura para usuarios autenticados (Panel de Admin).
         match /properties/{propertyId} {
           allow read: if true;
-          allow write: if false;
+          allow write: if request.auth != null;
         }
 
         // Reseñas: Lectura para todos, escritura solo para usuarios autenticados.

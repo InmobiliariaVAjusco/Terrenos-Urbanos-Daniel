@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { logoBase64 } from './assets';
+import { logoUrl } from './assets';
 
 interface LandingPageProps {
   onEnter: () => void;
@@ -27,7 +27,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnter, isExiting }) 
         {/* Logo Container - This will get the flight animation */}
         <div className={`${isExiting ? 'animate-fly-to-corner' : 'animate-fade-in-down'}`}>
            <img
-                src={logoBase64}
+                src={logoUrl}
                 alt="Logo de Inmuebles V"
                 className="h-40 w-40 md:h-48 md:w-48 object-contain drop-shadow-[0_5px_15px_rgba(0,0,0,0.4)]"
             />

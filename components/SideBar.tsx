@@ -37,8 +37,8 @@ export const SideBar: React.FC<SideBarProps> = ({ currentView, onViewChange, isO
     { view: 'buy', label: 'Venta', icon: <TagIcon /> },
     { view: 'rent', label: 'Renta', icon: <KeyIcon /> },
     { view: 'investment', label: 'Inversión', icon: <ChartIcon /> },
-    { view: 'privacy', label: 'Aviso de Privacidad', icon: <ShieldIcon /> },
     { view: 'contact', label: 'Contáctanos', icon: <MailIcon /> },
+    { view: 'privacy', label: 'Aviso de Privacidad', icon: <ShieldIcon /> },
   ];
 
   return (

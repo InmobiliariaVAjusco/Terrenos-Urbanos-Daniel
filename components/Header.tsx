@@ -31,20 +31,26 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick, currentUser, onLogo
                     >
                         <MenuIcon />
                     </button>
-                    <div className="flex-shrink-0">
-                      <Logo />
-                    </div>
-                    <div className="hidden sm:flex items-center gap-3">
-                        <h1 className="font-bold text-white text-xl tracking-wide flex-shrink-0">Inmobiliaria V</h1>
-                        <div className="w-px h-6 bg-green-500/50 hidden lg:block"></div>
-                        <div className="hidden lg:flex items-baseline text-base text-green-100 font-medium space-x-2">
-                            <span className="animate-fade-in-staggered" style={{ animationDelay: '200ms' }}>Bienes raíces</span>
-                            <span className="animate-fade-in-staggered text-green-400 font-bold" style={{ animationDelay: '300ms' }}>·</span>
-                            <span className="animate-fade-in-staggered" style={{ animationDelay: '400ms' }}>Agente de bienes raíces</span>
-                            <span className="animate-fade-in-staggered text-green-400 font-bold" style={{ animationDelay: '500ms' }}>·</span>
-                            <span className="animate-fade-in-staggered" style={{ animationDelay: '600ms' }}>Agentes hipotecarios</span>
+                    <button 
+                        onClick={() => onViewChange('home')}
+                        className="flex items-center gap-3 text-left"
+                        aria-label="Página de inicio de Inmobiliaria V"
+                    >
+                        <div className="flex-shrink-0">
+                          <Logo />
                         </div>
-                    </div>
+                        <div className="hidden sm:flex items-center gap-3">
+                            <h1 className="font-bold text-white text-xl tracking-wide flex-shrink-0">Inmobiliaria V</h1>
+                            <div className="w-px h-6 bg-green-500/50 hidden lg:block"></div>
+                            <div className="hidden lg:flex items-baseline text-base text-green-100 font-medium space-x-2">
+                                <span className="animate-fade-in-staggered" style={{ animationDelay: '200ms' }}>Bienes raíces</span>
+                                <span className="animate-fade-in-staggered text-green-400 font-bold" style={{ animationDelay: '300ms' }}>·</span>
+                                <span className="animate-fade-in-staggered" style={{ animationDelay: '400ms' }}>Agente de bienes raíces</span>
+                                <span className="animate-fade-in-staggered text-green-400 font-bold" style={{ animationDelay: '500ms' }}>·</span>
+                                <span className="animate-fade-in-staggered" style={{ animationDelay: '600ms' }}>Agentes hipotecarios</span>
+                            </div>
+                        </div>
+                    </button>
                 </div>
 
                 {/* Right Side: Login/User Menu */}
