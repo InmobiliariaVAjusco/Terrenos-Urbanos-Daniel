@@ -7,8 +7,8 @@ import { PropertyDetail } from './PropertyDetail';
 
 interface PropertyListProps {
   properties: Property[];
-  onToggleFavorite: (id: number) => void;
-  favorites: number[];
+  onToggleFavorite: (id: string) => void;
+  favorites: string[];
   title?: string;
 }
 
@@ -117,7 +117,7 @@ export const PropertyList: React.FC<PropertyListProps> = ({ properties, onToggle
       ) : (
         <div className="text-center py-16">
             <h3 className="text-xl font-semibold text-slate-700">No se encontraron inmuebles</h3>
-            <p className="text-slate-500 mt-2">Intenta ajustar tu búsqueda, filtros o revisa tus favoritos.</p>
+            <p className="text-slate-500 mt-2">Intenta ajustar tu búsqueda o filtros. Actualmente no hay propiedades que coincidan con tus criterios.</p>
         </div>
       )}
 

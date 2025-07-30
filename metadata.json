@@ -1,7 +1,6 @@
-
 {
-  "name": "· Inmuebles V · | Ajusco Tlalpan CDMX",
-  "description": "Plataforma para la compra y venta de inmuebles en Ajusco Tlalpan CDMX. Potenciada por IA para descripciones.",
+  "name": "Inmobiliaria V",
+  "description": "Inmobiliaria V: Tu experto en Bienes raíces, Agente de bienes raíces y Agentes hipotecarios en la zona del Ajusco, Tlalpan.",
   "requestFramePermissions": [],
   "prompt": ""
 }

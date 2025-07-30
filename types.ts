@@ -2,7 +2,7 @@
 export type PropertyType = 'Residencial' | 'Comercial' | 'Mixto';
 
 export interface Property {
-  id: number;
+  id: string;
   address: string;
   price: number;
   sqft: number;
@@ -13,6 +13,7 @@ export interface Property {
   description: string;
   services: string[]; // e.g. ['Agua', 'Luz', 'Drenaje']
   publicationDate: string; // ISO 8601 date string
+  isFeatured?: boolean; // <-- Campo para destacar en el carrusel
 }
 
 export interface Review {
@@ -34,4 +35,4 @@ export interface User {
 
 export type PrivacyState = 'pending' | 'accepted' | 'rejected';
 
-export type View = 'home' | 'buy' | 'sell' | 'favorites' | 'rent' | 'investment' | 'privacy' | 'contact';
+export type View = 'home' | 'buy' | 'favorites' | 'rent' | 'investment' | 'privacy' | 'contact' | 'my-reviews';

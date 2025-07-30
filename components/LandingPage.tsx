@@ -1,33 +1,41 @@
 
 import React from 'react';
-import { Logo } from './Logo';
+import { logoBase64 } from './assets';
 
 interface LandingPageProps {
   onEnter: () => void;
+  isExiting: boolean;
 }
 
-export const LandingPage: React.FC<LandingPageProps> = ({ onEnter }) => {
+export const LandingPage: React.FC<LandingPageProps> = ({ onEnter, isExiting }) => {
   return (
-    <div className="relative h-screen w-screen overflow-hidden">
+    <div className={`relative h-screen w-screen overflow-hidden ${isExiting ? 'pointer-events-none' : ''}`}>
       {/* GIF Background */}
       <div
         className="absolute top-0 left-0 w-full h-full bg-cover bg-center z-0"
         style={{
-          backgroundImage: `url('https://upload.wikimedia.org/wikipedia/commons/d/db/V%C3%B5rtsj%C3%A4rv_-_50038643306.gif?20201125023232')`
+          backgroundImage: `url('https://upload.wikimedia.org/wikipedia/commons/9/99/V%C3%B5rtsj%C3%A4rv_-_50038578051.gif')`
         }}
-      ></div>
-
-      {/* Dark Overlay */}
-      <div className="absolute top-0 left-0 w-full h-full bg-black/60 z-10"></div>
+      >
+        {/* Dark Overlay that transitions to white to prevent flash */}
+        <div className={`absolute top-0 left-0 w-full h-full bg-black/60 z-10 ${isExiting ? 'animate-fade-to-white' : ''}`}></div>
+      </div>
       
-      {/* Content */}
-      <div className="relative z-20 flex flex-col items-center justify-center h-full text-white text-center p-4">
-        <div className="animate-fade-in-down">
-          <Logo />
+      {/* Centered Content Container */}
+      <div className="relative z-20 h-full w-full flex flex-col items-center justify-center text-center p-4">
+        
+        {/* Logo Container - This will get the flight animation */}
+        <div className={`${isExiting ? 'animate-fly-to-corner' : 'animate-fade-in-down'}`}>
+           <img
+                src={logoBase64}
+                alt="Logo de Inmuebles V"
+                className="h-40 w-40 md:h-48 md:w-48 object-contain drop-shadow-[0_5px_15px_rgba(0,0,0,0.4)]"
+            />
         </div>
         
-        <div className="animate-fade-in-up mt-8">
-            <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight leading-tight" style={{ textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}>
+        {/* Text and Button Container */}
+        <div className={`w-full max-w-3xl text-white ${isExiting ? 'animate-exit-text' : 'animate-fade-in-up'}`}>
+            <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight leading-tight mt-6" style={{ textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}>
                 Encuentra tu Espacio.
                 <br />
                 <span className="text-green-400">Construye tu Futuro.</span>
@@ -49,19 +57,61 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnter }) => {
       </div>
       <style>{`
         @keyframes fade-in-down {
-          from { opacity: 0; transform: translateY(-20px); }
-          to { opacity: 1; transform: translateY(0); }
+          from { opacity: 0; transform: translateY(-30px) scale(0.95); }
+          to { opacity: 1; transform: translateY(0) scale(1); }
         }
         @keyframes fade-in-up {
-          from { opacity: 0; transform: translateY(20px); }
+          from { opacity: 0; transform: translateY(30px); }
           to { opacity: 1; transform: translateY(0); }
         }
         .animate-fade-in-down {
-          animation: fade-in-down 1s ease-out forwards;
+          animation: fade-in-down 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
         }
         .animate-fade-in-up {
-          animation: fade-in-up 1s ease-out 0.5s forwards;
+          animation: fade-in-up 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.3s forwards;
           opacity: 0; /* Start hidden for staggered animation */
+        }
+
+        /* Exit Animations */
+
+        /* The flying logo animation */
+        @keyframes fly-to-corner {
+          0% {
+            transform: translate(0, 0) scale(1);
+            opacity: 1;
+          }
+          100% {
+            /* These values are an approximation to move the logo from the center
+               towards the top-left corner, simulating it flying to the header. */
+            transform: translate(calc(-50vw + 80px), calc(-45vh + 40px)) scale(0.25);
+            opacity: 0;
+          }
+        }
+        .animate-fly-to-corner {
+          /* A nice curved timing function makes it feel more dynamic. Duration matches setTimeout in App.tsx */
+          animation: fly-to-corner 1.2s cubic-bezier(0.5, 0, 0.75, 0) forwards;
+        }
+
+        @keyframes exit-text {
+          from { opacity: 1; transform: translateY(0); }
+          to { opacity: 0; transform: translateY(20px); }
+        }
+        .animate-exit-text {
+          /* Fade out text faster than the logo flight */
+          animation: exit-text 0.5s ease-out forwards;
+        }
+        
+        @keyframes fade-to-white {
+          0% {
+            background-color: rgba(0, 0, 0, 0.6);
+          }
+          100% {
+            background-color: rgb(255, 255, 255);
+          }
+        }
+        .animate-fade-to-white {
+          /* Start after text fades, finish as logo animation ends */
+          animation: fade-to-white 0.7s ease-in-out 0.5s forwards;
         }
       `}</style>
     </div>

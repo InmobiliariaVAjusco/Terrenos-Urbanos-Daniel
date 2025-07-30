@@ -18,16 +18,28 @@ Sigue estos pasos **cuidadosamente** para configurar y desplegar tu propia versi
     *   En la pestaña **General**, baja hasta la sección "Tus apps".
     *   Haz clic en el ícono de **App web** (`</>`) para registrar una nueva.
     *   Dale un apodo (ej. "Mi Portal Inmobiliario") y haz clic en **"Registrar app"**.
-    *   Firebase te mostrará un objeto `firebaseConfig`. **¡Esto es muy importante!**
+    *   Firebase te mostrará un objeto `firebaseConfig`. **¡Esto es muy importante!** De aquí necesitarás la `apiKey`.
 
-### ✅ Paso 2: Configurar el Archivo `firebase.ts`
+### ✅ Paso 2: Configurar Variables de Entorno
 
-1.  **Copia tu `apiKey`:** Del objeto `firebaseConfig` que viste en el paso anterior, copia el valor de la propiedad `apiKey`. Es una cadena larga de texto.
+Para mantener tu `apiKey` segura, no la pondremos directamente en el código. Usaremos variables de entorno.
 
-2.  **Pega la `apiKey` en el código:**
-    *   Abre el archivo `firebase.ts` en tu editor de código.
-    *   Busca la línea: `apiKey: "TU_API_KEY_AQUI",`
-    *   **Reemplaza `"TU_API_KEY_AQUI"`** con la `apiKey` que copiaste. Asegúrate de que quede entre comillas.
+**Para Despliegue en Vercel (Recomendado):**
+
+1.  Ve al panel de control de tu proyecto en Vercel.
+2.  Ve a la pestaña **Settings** y luego a **Environment Variables**.
+3.  Crea una nueva variable con el siguiente nombre y valor:
+    *   **Name:** `API_KEY`
+    *   **Value:** Pega aquí la `apiKey` que copiaste de tu `firebaseConfig`.
+4.  Guarda los cambios. Vercel usará automáticamente esta clave durante el proceso de build.
+
+**Para Pruebas Locales:**
+
+Para que el comando `npm run build` funcione localmente, necesitas que la variable de entorno esté disponible. La forma más fácil es prefijar el comando en tu terminal:
+
+```bash
+API_KEY="tu-api-key-aqui" npm run build
+```
 
 ### ✅ Paso 3: Habilitar los Servicios de Firebase
 
@@ -48,12 +60,21 @@ Sigue estos pasos **cuidadosamente** para configurar y desplegar tu propia versi
 
 4.  **Configurar las Reglas de Seguridad:**
     *   Una vez creada la base de datos, ve a la pestaña **Reglas**.
-    *   Reemplaza todo el contenido con las siguientes reglas. Esto permite que cualquiera lea las opiniones, pero solo los usuarios registrados pueden escribir las suyas.
+    *   Reemplaza todo el contenido con las siguientes reglas. Esto permite que cualquiera lea las propiedades y las opiniones, pero solo los usuarios autenticados pueden escribir sus propias reseñas. La escritura de propiedades está deshabilitada para los clientes.
 
     ```
     rules_version = '2';
     service cloud.firestore {
       match /databases/{database}/documents {
+        
+        // Propiedades: Solo lectura para clientes.
+        // La escritura debe ser manejada por un backend o panel de admin con credenciales privilegiadas.
+        match /properties/{propertyId} {
+          allow read: if true;
+          allow write: if false;
+        }
+
+        // Reseñas: Lectura para todos, escritura solo para usuarios autenticados.
         match /reviews/{reviewId} {
           allow read: if true;
           allow create: if request.auth != null;
@@ -70,8 +91,8 @@ Sigue estos pasos **cuidadosamente** para configurar y desplegar tu propia versi
 
 Si la aplicación muestra un error de conexión, revisa esta lista punto por punto. El 99% de los problemas se resuelven aquí.
 
-*   **[  ] ¿La `apiKey` en `firebase.ts` es correcta?**
-    *   Abre `firebase.ts` y la configuración de tu app en la consola de Firebase. Compara las `apiKey` carácter por carácter. ¡Son sensibles a mayúsculas y minúsculas!
+*   **[  ] ¿La variable de entorno `API_KEY` está configurada en Vercel?**
+    *   Abre la configuración de tu proyecto en Vercel y verifica que la variable `API_KEY` exista y que su valor sea correcto. ¡Son sensibles a mayúsculas y minúsculas!
 
 *   **[  ] ¿El proveedor de "Correo/Contraseña" está HABILITADO?**
     *   Ve a `Firebase Console > Authentication > Sign-in method`. El interruptor para "Correo electrónico/Contraseña" debe estar en azul (activado).
@@ -80,7 +101,7 @@ Si la aplicación muestra un error de conexión, revisa esta lista punto por pun
     *   Ve a `Firebase Console > Authentication > Sign-in method`. El interruptor para "Google" debe estar en azul (activado).
 
 *   **[  ] ¿Has creado la base de datos de Firestore?**
-    *   Ve a `Firebase Console > Firestore Database`. Deberías ver tu base de datos y la colección `reviews` (si ya se escribió alguna), no un botón de "Crear base de datos".
+    *   Ve a `Firebase Console > Firestore Database`. Deberías ver tus colecciones (`properties`, `reviews`), no un botón de "Crear base de datos".
 
 *   **[  ] ¿Las reglas de Firestore son las correctas?**
     *   Ve a `Firebase Console > Firestore Database > Reglas`. El código debe ser idéntico al que se proporciona en el Paso 3.4 de esta guía.

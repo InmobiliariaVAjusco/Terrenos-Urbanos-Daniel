@@ -9,7 +9,6 @@ const KeyIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6
 const ChartIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>;
 const ShieldIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 20.917l9-3.462 9 3.462a12.02 12.02 0 00-3.382-8.94" /></svg>;
 const MailIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>;
-const PlusCircleIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>;
 
 interface SideBarProps {
   currentView: View;
@@ -38,7 +37,6 @@ export const SideBar: React.FC<SideBarProps> = ({ currentView, onViewChange, isO
     { view: 'buy', label: 'Venta', icon: <TagIcon /> },
     { view: 'rent', label: 'Renta', icon: <KeyIcon /> },
     { view: 'investment', label: 'Inversión', icon: <ChartIcon /> },
-    { view: 'sell', label: 'Vender Propiedad', icon: <PlusCircleIcon /> },
     { view: 'privacy', label: 'Aviso de Privacidad', icon: <ShieldIcon /> },
     { view: 'contact', label: 'Contáctanos', icon: <MailIcon /> },
   ];

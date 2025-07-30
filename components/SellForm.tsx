@@ -85,7 +85,7 @@ export const SellForm: React.FC<SellFormProps> = ({ onAddProperty }) => {
     await new Promise(res => setTimeout(res, 500));
       
     const newProperty: Omit<Property, 'publicationDate'> = {
-      id: Date.now(),
+      id: Date.now().toString(),
       address: formData.address,
       price: parseInt(formData.price, 10),
       sqft: parseInt(formData.sqft, 10),

@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Review, User } from '../types';
 import { ReviewCard } from './ReviewCard';
 import { ReviewForm } from './ReviewForm';
@@ -14,6 +14,8 @@ interface ReviewsSectionProps {
   onLoginRequest: () => void;
   connectionStatus: ConnectionStatus;
 }
+
+const REVIEWS_PER_PAGE = 6;
 
 const OfflineWarningBanner = () => (
     <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-8 rounded-md" role="alert">
@@ -33,16 +35,23 @@ const OfflineWarningBanner = () => (
 
 
 export const ReviewsSection: React.FC<ReviewsSectionProps> = ({ reviews, currentUser, onAddReview, onDeleteReview, onLoginRequest, connectionStatus }) => {
+  const [visibleCount, setVisibleCount] = useState(REVIEWS_PER_PAGE);
+  
+  const handleShowMore = () => {
+      setVisibleCount(prevCount => prevCount + REVIEWS_PER_PAGE);
+  };
+
+  const visibleReviews = reviews.slice(0, visibleCount);
+
   return (
-    <section className="bg-slate-50 py-16 mt-8">
+    <section className="bg-slate-50 py-16 mt-24">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold text-slate-900">Lo que dicen nuestros clientes</h2>
           <p className="text-slate-600 mt-2 max-w-2xl mx-auto">La confianza y satisfacción de quienes nos eligen es nuestro mayor orgullo.</p>
         </div>
         
-        <div className="max-w-4xl mx-auto">
-
+        <div className="max-w-6xl mx-auto">
           {connectionStatus === 'offline' && <OfflineWarningBanner />}
 
           <div className="mb-12">
@@ -60,32 +69,44 @@ export const ReviewsSection: React.FC<ReviewsSectionProps> = ({ reviews, current
               </div>
             )}
           </div>
+          
+          {visibleReviews.length > 0 && (
+            <div className="columns-1 md:columns-2 lg:columns-3 gap-8 space-y-8">
+              {visibleReviews.map(review => (
+                  <ReviewCard 
+                      key={review.id} 
+                      review={review}
+                      currentUser={currentUser}
+                      onDelete={onDeleteReview}
+                  />
+              ))}
+            </div>
+          )}
 
-          <div className="space-y-8">
-            {reviews.length > 0 ? (
-                reviews.map(review => (
-                    <ReviewCard 
-                        key={review.id} 
-                        review={review}
-                        currentUser={currentUser}
-                        onDelete={onDeleteReview}
-                    />
-                ))
-            ) : (
-                connectionStatus === 'connecting' && (
-                    <div className="text-center py-8 text-slate-500">
-                        <div className="w-8 h-8 border-2 border-slate-300 border-t-slate-500 rounded-full animate-spin mx-auto mb-4"></div>
-                        Cargando opiniones...
-                    </div>
-                )
-            )}
-             {reviews.length === 0 && connectionStatus === 'online' && (
-                 <div className="text-center py-12 bg-white rounded-lg shadow border border-slate-200">
-                    <h3 className="text-xl font-semibold text-slate-700">¡Sé el primero en opinar!</h3>
-                    <p className="text-slate-500 mt-2">Aún no hay reseñas. Nos encantaría conocer tu experiencia.</p>
-                </div>
-            )}
-          </div>
+          {connectionStatus === 'connecting' && (
+              <div className="text-center py-8 text-slate-500">
+                  <div className="w-8 h-8 border-2 border-slate-300 border-t-slate-500 rounded-full animate-spin mx-auto mb-4"></div>
+                  Cargando opiniones...
+              </div>
+          )}
+          
+          {reviews.length === 0 && connectionStatus !== 'connecting' && (
+               <div className="text-center py-12 bg-white rounded-lg shadow border border-slate-200">
+                  <h3 className="text-xl font-semibold text-slate-700">¡Sé el primero en opinar!</h3>
+                  <p className="text-slate-500 mt-2">Aún no hay reseñas. Nos encantaría conocer tu experiencia.</p>
+              </div>
+          )}
+
+          {visibleCount < reviews.length && (
+            <div className="text-center mt-12">
+              <button
+                onClick={handleShowMore}
+                className="px-8 py-3 bg-white text-green-700 font-bold rounded-lg border-2 border-green-600 hover:bg-green-50 transition-transform hover:scale-105"
+              >
+                Ver más comentarios
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </section>

@@ -3,10 +3,9 @@
 declare const firebase: any;
 
 // Tu configuración de Firebase
-// ¡IMPORTANTE! Pega aquí tu clave de API de Firebase.
+// ¡IMPORTANTE! La API Key se carga desde las variables de entorno.
 export const firebaseConfig = {
-  // REEMPLAZA "TU_API_KEY_AQUI" CON TU CLAVE DE API REAL DE FIREBASE
-  apiKey: "AIzaSyCcU2CbpSkVSVfHIAOvePo7fjlJSRtVjgA", // <-- ¡MUY IMPORTANTE!
+  // La API Key ya no se escribe aquí. Se inyecta durante el build.
   authDomain: "inmuebles-v.firebaseapp.com",
   projectId: "inmuebles-v",
   storageBucket: "inmuebles-v.appspot.com",
@@ -28,11 +27,13 @@ try {
 
   // Luego, inicializar la app solo si no se ha hecho antes
   if (!firebase.apps.length) {
-    // Validar que la API key se haya reemplazado
-    if (firebaseConfig.apiKey === "TU_API_KEY_AQUI" || !firebaseConfig.apiKey) {
+    // Validar que la API key se haya proporcionado via environment variable
+    if (!process.env.API_KEY) {
       throw new Error("API_KEY_MISSING");
     }
-    firebase.initializeApp(firebaseConfig);
+    
+    const configWithApiKey = { ...firebaseConfig, apiKey: process.env.API_KEY };
+    firebase.initializeApp(configWithApiKey);
   }
 
   // Finalmente, exportar los servicios

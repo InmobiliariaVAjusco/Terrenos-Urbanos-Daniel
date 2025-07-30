@@ -20,6 +20,10 @@ async function build() {
       entryPoints: ['index.tsx'],
       bundle: true,
       outfile: path.join(outdir, 'index.js'),
+      // Define process.env.API_KEY so it can be replaced at build time.
+      define: {
+        'process.env.API_KEY': JSON.stringify(process.env.API_KEY || '')
+      },
       // Define dependencies that are loaded via the importmap in index.html as external.
       // This tells esbuild not to bundle them.
       external: [

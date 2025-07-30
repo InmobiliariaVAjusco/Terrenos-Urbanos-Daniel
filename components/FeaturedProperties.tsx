@@ -1,5 +1,5 @@
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { Property } from '../types';
 import { FeaturedPropertyCard } from './FeaturedPropertyCard';
 import { Modal } from './Modal';
@@ -7,8 +7,8 @@ import { PropertyDetail } from './PropertyDetail';
 
 interface FeaturedPropertiesProps {
   properties: Property[];
-  onToggleFavorite: (id: number) => void;
-  favorites: number[];
+  onToggleFavorite: (id: string) => void;
+  favorites: string[];
 }
 
 // Arrow icons for navigation
@@ -26,21 +26,34 @@ const ChevronRightIcon = () => (
 export const FeaturedProperties: React.FC<FeaturedPropertiesProps> = ({ properties, onToggleFavorite, favorites }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
+  const [isPaused, setIsPaused] = useState(false); // For pausing auto-play on hover
 
-  const featured = properties.slice(0, 5); // Take first 5 properties for the feature
+  // Filtra solo las propiedades marcadas como destacadas.
+  const featured = useMemo(() => properties.filter(p => p.isFeatured), [properties]);
 
-  const goToPrevious = () => {
+  // Use useCallback to memoize these functions
+  const goToPrevious = useCallback(() => {
     const isFirstSlide = currentIndex === 0;
     const newIndex = isFirstSlide ? featured.length - 1 : currentIndex - 1;
     setCurrentIndex(newIndex);
-  };
+  }, [currentIndex, featured.length]);
 
-  const goToNext = () => {
+  const goToNext = useCallback(() => {
     const isLastSlide = currentIndex === featured.length - 1;
     const newIndex = isLastSlide ? 0 : currentIndex + 1;
     setCurrentIndex(newIndex);
-  };
+  }, [currentIndex, featured.length]);
   
+  // Effect for auto-playing the carousel
+  useEffect(() => {
+    // Don't auto-play if paused by user hover or if there's only one slide
+    if (isPaused || featured.length <= 1) return;
+
+    const slideInterval = setTimeout(goToNext, 5000); // Change slide every 5 seconds
+
+    return () => clearTimeout(slideInterval); // Clear timeout on cleanup
+  }, [currentIndex, isPaused, goToNext, featured.length]);
+
   const handleSelectProperty = useCallback((property: Property) => {
     setSelectedProperty(property);
   }, []);
@@ -51,14 +64,19 @@ export const FeaturedProperties: React.FC<FeaturedPropertiesProps> = ({ properti
 
   if (!featured || featured.length === 0) {
     return (
-        <div className="text-center py-16">
-            <h3 className="text-xl font-semibold text-slate-700">No hay propiedades destacadas</h3>
+        <div className="text-center py-16 bg-slate-50 rounded-lg">
+            <h3 className="text-xl font-semibold text-slate-700">No hay propiedades destacadas por el momento</h3>
+            <p className="text-slate-500 mt-2">Explora nuestro catálogo completo en la sección de 'Venta'.</p>
         </div>
     );
   }
 
   return (
-    <section className="relative w-full h-[75vh] min-h-[600px] group">
+    <section 
+      className="relative w-full h-[60vh] min-h-[500px] group"
+      onMouseEnter={() => setIsPaused(true)}
+      onMouseLeave={() => setIsPaused(false)}
+    >
       {/* Carousel Container */}
       <div className="w-full h-full rounded-2xl overflow-hidden relative">
         {featured.map((property, index) => (

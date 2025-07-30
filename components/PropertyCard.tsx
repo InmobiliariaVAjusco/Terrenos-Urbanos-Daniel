@@ -5,7 +5,7 @@ import { Property } from '../types';
 interface PropertyCardProps {
   property: Property;
   onSelect: (property: Property) => void;
-  onToggleFavorite: (id: number) => void;
+  onToggleFavorite: (id: string) => void;
   isFavorite: boolean;
 }
 
