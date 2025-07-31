@@ -11,6 +11,8 @@ export type PropertyCategory =
   | 'Comercial' 
   | 'Mixto';
 
+export type PropertyStatus = 'Disponible' | 'Vendida' | 'Rentada';
+
 export interface Property {
   id: string;
   address: string;
@@ -24,6 +26,7 @@ export interface Property {
   description: string;
   services: string[]; // e.g. ['Agua', 'Luz', 'Drenaje']
   publicationDate: string; // ISO 8601 date string
+  status: PropertyStatus; // <-- Nuevo campo para el estado
   isFeatured?: boolean; // <-- Campo para destacar en el carrusel
   rooms?: number;
   bathrooms?: number;
@@ -47,6 +50,25 @@ export interface User {
   photoURL: string | null;
 }
 
+export interface Advisor {
+    name: string;
+    photoUrl: string;
+    description: string;
+    phone: string;
+    whatsapp: string;
+}
+
 export type PrivacyState = 'pending' | 'accepted' | 'rejected';
 
 export type View = 'home' | 'buy' | 'favorites' | 'rent' | 'investment' | 'privacy' | 'contact' | 'my-reviews';
+
+export type SellRequestData = {
+  name: string;
+  email: string;
+  phone: string;
+  address: string;
+  propertyType: string;
+  description: string;
+  imageUrls: string[];
+  price: string;
+};

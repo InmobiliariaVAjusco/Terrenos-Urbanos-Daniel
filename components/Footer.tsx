@@ -18,17 +18,10 @@ export const Footer: React.FC = () => {
     <footer className="bg-slate-50 text-slate-600 mt-12 border-t">
       <div className="container mx-auto px-4 py-8">
         
-        {/* Using a grid for a balanced layout. 2 cols on desktop, 1 on mobile. */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           
-          {/* Copyright Section (aligns left on desktop) */}
-          <div className="text-center md:text-left">
-            <p className="font-semibold text-slate-800">Inmobiliaria V</p>
-            <p className="text-sm">&copy; {new Date().getFullYear()} Todos los derechos reservados.</p>
-          </div>
-
-          {/* Social Media Section (aligns right on desktop) */}
-          <div className="flex flex-col items-center md:items-end">
+          {/* Left Section: Social Media */}
+          <div className="md:w-1/3 flex flex-col items-center md:items-start">
             <h3 className="font-semibold text-slate-800 mb-3">Síguenos en nuestras redes</h3>
             <div className="flex justify-center items-center space-x-4">
               <a 
@@ -60,6 +53,15 @@ export const Footer: React.FC = () => {
               </a>
             </div>
           </div>
+          
+          {/* Center Section: Copyright */}
+          <div className="md:w-1/3 text-center text-sm text-slate-600 order-first md:order-none">
+            <p className="font-semibold text-slate-800">Inmobiliaria V</p>
+            <p>&copy; {new Date().getFullYear()} Todos los derechos reservados.</p>
+          </div>
+          
+          {/* Right Section: Spacer to ensure the copyright is centered on desktop */}
+          <div className="hidden md:block md:w-1/3"></div>
         </div>
         
       </div>

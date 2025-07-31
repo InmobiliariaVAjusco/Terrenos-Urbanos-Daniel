@@ -1,6 +1,6 @@
 
-import React, { useState } from 'react';
-import { Property, ListingType, PropertyCategory } from '../types';
+import React, { useState, useRef } from 'react';
+import { Property, ListingType, PropertyCategory, PropertyStatus } from '../types';
 
 interface SellFormProps {
   onAddProperty: (property: Omit<Property, 'publicationDate' | 'id'>) => void;
@@ -21,6 +21,7 @@ const UploadingSpinner = () => (
 );
 
 const propertyCategories: PropertyCategory[] = ['Casa', 'Departamento', 'Terreno', 'Rancho', 'Casa en condominio', 'Casa con terreno', 'Comercial', 'Mixto'];
+const propertyStatuses: PropertyStatus[] = ['Disponible', 'Vendida', 'Rentada'];
 
 
 export const SellForm: React.FC<SellFormProps> = ({ onAddProperty }) => {
@@ -34,6 +35,7 @@ export const SellForm: React.FC<SellFormProps> = ({ onAddProperty }) => {
     listingType: 'Venta' as ListingType,
     services: '',
     description: '',
+    status: 'Disponible' as PropertyStatus,
     isFeatured: false,
     rooms: '',
     bathrooms: '',
@@ -44,6 +46,10 @@ export const SellForm: React.FC<SellFormProps> = ({ onAddProperty }) => {
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+
+  // Refs for drag and drop image reordering
+  const dragItemIndex = useRef<number | null>(null);
+  const dragOverItemIndex = useRef<number | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
@@ -81,6 +87,20 @@ export const SellForm: React.FC<SellFormProps> = ({ onAddProperty }) => {
       setImagePreviews(prev => prev.filter((_, index) => index !== indexToRemove));
   };
 
+  const handleSortImages = () => {
+    if (dragItemIndex.current === null || dragOverItemIndex.current === null) return;
+    if (dragItemIndex.current === dragOverItemIndex.current) return;
+
+    const items = [...imagePreviews];
+    const draggedItem = items.splice(dragItemIndex.current, 1)[0];
+    items.splice(dragOverItemIndex.current, 0, draggedItem);
+    
+    dragItemIndex.current = null;
+    dragOverItemIndex.current = null;
+    
+    setImagePreviews(items);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -108,6 +128,7 @@ export const SellForm: React.FC<SellFormProps> = ({ onAddProperty }) => {
       services: formData.services.split(',').map(f => f.trim()).filter(f => f),
       description: formData.description,
       images: imagePreviews,
+      status: formData.status,
       isFeatured: formData.isFeatured,
       rooms: formData.rooms ? parseInt(formData.rooms, 10) : undefined,
       bathrooms: formData.bathrooms ? parseInt(formData.bathrooms, 10) : undefined,
@@ -199,7 +220,14 @@ export const SellForm: React.FC<SellFormProps> = ({ onAddProperty }) => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-slate-700">Imágenes del Inmueble</label>
+            <label htmlFor="status" className="block text-sm font-medium text-slate-700">Estado del Inmueble</label>
+            <select name="status" id="status" value={formData.status} onChange={handleChange} required className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500">
+                {propertyStatuses.map(stat => <option key={stat} value={stat}>{stat}</option>)}
+            </select>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-slate-700">Imágenes del Inmueble (Arrastra para reordenar)</label>
            <div className="mt-4 flex justify-center px-6 pt-5 pb-6 border-2 border-slate-300 border-dashed rounded-md">
             <div className="space-y-1 text-center">
                 <svg className="mx-auto h-12 w-12 text-slate-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true"><path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" /></svg>
@@ -215,9 +243,20 @@ export const SellForm: React.FC<SellFormProps> = ({ onAddProperty }) => {
             {imagePreviews.length > 0 && (
                 <div className="mt-4 grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 gap-3">
                     {imagePreviews.map((image, index) => (
-                        <div key={index} className="relative group aspect-square">
+                        <div 
+                          key={index} 
+                          className="relative group aspect-square cursor-grab active:cursor-grabbing"
+                          draggable
+                          onDragStart={() => (dragItemIndex.current = index)}
+                          onDragEnter={() => (dragOverItemIndex.current = index)}
+                          onDragEnd={handleSortImages}
+                          onDragOver={(e) => e.preventDefault()}
+                        >
+                            <div className="absolute top-1 left-1 bg-black/60 backdrop-blur-sm text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center z-10 pointer-events-none">
+                              {index + 1}
+                            </div>
                             <img src={image} alt={`Vista previa ${index + 1}`} className="w-full h-full object-cover rounded-md shadow-md" />
-                            <button type="button" onClick={() => handleRemoveImage(index)} className="absolute top-0 right-0 -m-2 p-1 bg-red-600 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity focus:opacity-100" aria-label={`Eliminar imagen ${index + 1}`}>
+                            <button type="button" onClick={() => handleRemoveImage(index)} className="absolute top-0 right-0 -m-2 p-1 bg-red-600 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity focus:opacity-100 z-20" aria-label={`Eliminar imagen ${index + 1}`}>
                                <CloseIcon />
                             </button>
                         </div>

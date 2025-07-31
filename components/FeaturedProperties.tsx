@@ -49,7 +49,7 @@ export const FeaturedProperties: React.FC<FeaturedPropertiesProps> = ({ properti
     // Don't auto-play if paused by user hover or if there's only one slide
     if (isPaused || featured.length <= 1) return;
 
-    const slideInterval = setTimeout(goToNext, 5000); // Change slide every 5 seconds
+    const slideInterval = setTimeout(goToNext, 3000); // Change slide every 3 seconds
 
     return () => clearTimeout(slideInterval); // Clear timeout on cleanup
   }, [currentIndex, isPaused, goToNext, featured.length]);

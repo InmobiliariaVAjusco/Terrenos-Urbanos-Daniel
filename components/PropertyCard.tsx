@@ -35,15 +35,24 @@ export const PropertyCard: React.FC<PropertyCardProps> = memo(({ property, onSel
     onToggleFavorite(property.id);
   };
 
-  const { category, listingType, price, images, address, mainFeatures } = property;
+  const { category, listingType, price, images, address, mainFeatures, status } = property;
   const bannerText = `${category} en ${listingType}`;
+  const isAvailable = status === 'Disponible' || !status; // Treat missing status as available
 
   return (
     <div onClick={() => onSelect(property)} className="group w-full text-left bg-white rounded-xl shadow-lg overflow-hidden border border-slate-200 hover:shadow-2xl hover:-translate-y-1.5 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-green-500 transition-all duration-300 flex flex-col cursor-pointer">
       <div className="relative">
-        <img src={images[0]} alt={`Vista del inmueble en ${address}`} className="w-full h-52 object-cover transition-transform duration-300 group-hover:scale-105" />
+        <img src={images[0]} alt={`Vista del inmueble en ${address}`} className={`w-full h-52 object-cover transition-all duration-300 group-hover:scale-105 ${!isAvailable ? 'opacity-60' : ''}`} />
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent"></div>
         
+        {!isAvailable && (
+            <div className="absolute inset-0 bg-black/40 flex items-center justify-center z-10">
+                <span className="text-white font-bold text-lg uppercase bg-red-600 px-4 py-1 rounded shadow-lg transform -rotate-6">
+                    {status}
+                </span>
+            </div>
+        )}
+
         <div className="absolute top-3 left-3">
             <div className="px-3 py-1.5 bg-slate-800/80 backdrop-blur-sm text-white font-bold text-sm rounded-full shadow-lg uppercase tracking-wider">
                 {bannerText}

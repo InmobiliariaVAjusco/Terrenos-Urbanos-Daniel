@@ -14,7 +14,10 @@ import { InvestmentPage } from './components/InvestmentPage';
 import { ContactPage } from './components/ContactPage';
 import { FeaturedProperties } from './components/FeaturedProperties';
 import { ServicesSection } from './components/ServicesSection';
+import { AboutUsSection } from './components/AboutUsSection';
 import { UserReviewsPage } from './components/UserReviewsPage';
+import { FloatingSellButton } from './components/FloatingSellButton';
+import { SellRequestModal } from './components/SellRequestModal';
 import { Property, User, Review, PrivacyState, View } from './types';
 import { INITIAL_REVIEWS } from './constants';
 import { auth, db, firebaseInitError } from './firebase';
@@ -58,307 +61,233 @@ const FirebaseInitErrorScreen = ({ error }: { error: SimpleError }) => (
             </svg>
         </div>
         <h1 className="text-3xl font-bold mb-2 text-center">Error de Conexión con Firebase</h1>
-        <p className="text-lg text-center max-w-2xl mb-6">
-            No se pudo establecer la conexión con los servicios de Firebase. Revisa los pasos de la guía de configuración.
+        <p className="text-lg text-center max-w-2xl">
+          No se pudo establecer la conexión con la base de datos. Esto puede deberse a una configuración incorrecta o a un problema de red.
         </p>
-        <details className="p-4 bg-yellow-100 rounded-lg text-left font-mono text-sm max-w-2xl w-full shadow-inner cursor-pointer">
-            <summary className="font-bold text-yellow-900">Detalles del error técnico</summary>
-            <pre className="mt-2 p-3 bg-white rounded text-yellow-800 overflow-auto text-xs">
-                {`Nombre: ${error.name}\nMensaje: ${error.message}${error.code ? `\nCódigo: ${error.code}`: ''}`}
-            </pre>
-        </details>
+        <div className="mt-6 p-4 bg-yellow-100 rounded-lg text-left font-mono text-sm max-w-2xl w-full shadow-inner">
+            <p><span className="font-bold">Mensaje de Error:</span> {error.message}</p>
+            <p className="mt-2"><span className="font-bold">Recomendación:</span> Revisa la configuración de tu proyecto de Firebase, las reglas de seguridad y que tu clave de API (API_KEY) esté correctamente configurada.</p>
+        </div>
     </div>
 );
 
-// Main Application Component
-const App = () => {
-    // State for app navigation and data
+
+const App: React.FC = () => {
+    // State
+    const [currentUser, setCurrentUser] = useState<User | null>(null);
+    const [isLoginModalOpen, setLoginModalOpen] = useState(false);
+    const [isSellModalOpen, setSellModalOpen] = useState(false);
+    const [isSideBarOpen, setSideBarOpen] = useState(false);
     const [currentView, setCurrentView] = useState<View>('home');
+    const [pageKey, setPageKey] = useState(Date.now());
     const [properties, setProperties] = useState<Property[]>([]);
     const [reviews, setReviews] = useState<Review[]>(INITIAL_REVIEWS);
     const [favorites, setFavorites] = useState<string[]>([]);
-    const [animationClass, setAnimationClass] = useState('');
-    
-    // State for UI controls
-    const [isSidebarOpen, setSidebarOpen] = useState(false);
-    const [isLoginModalOpen, setLoginModalOpen] = useState(false);
-
-    // User and Authentication state
-    const [currentUser, setCurrentUser] = useState<User | null>(null);
-    const [authLoading, setAuthLoading] = useState(true);
-
-    // *** REVISED PRIVACY AND LANDING STATE LOGIC ***
-    const [appState, setAppState] = useState<AppState>('landing');
     const [privacyState, setPrivacyState] = useState<PrivacyState>('pending');
-
-    // Database connection status
     const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>('connecting');
+    const [appState, setAppState] = useState<AppState>('landing');
+    const [isExitingLanding, setIsExitingLanding] = useState(false);
 
-    // --- Effects ---
-
-    // Effect for checking privacy consent on mount.
+    // Data Fetching and Auth Listeners
     useEffect(() => {
-        try {
-            const consent = localStorage.getItem(PRIVACY_CONSENT_KEY) as PrivacyState | null;
-            if (consent === 'accepted' || consent === 'rejected') {
-                setPrivacyState(consent);
-            } else {
-                 setPrivacyState('pending');
-            }
-        } catch (error) {
-            console.error("No se pudo acceder a localStorage:", error);
-            setPrivacyState('pending');
+        const consent = localStorage.getItem(PRIVACY_CONSENT_KEY);
+        if (consent === 'accepted' || consent === 'rejected') {
+            setPrivacyState(consent);
         }
-    }, []);
 
-    // Effect for Firebase authentication state
-    useEffect(() => {
-        if (!auth) {
-            setAuthLoading(false);
-            return;
-        }
-        const unsubscribe = auth.onAuthStateChanged((user: User | null) => {
+        if (firebaseInitError) return;
+
+        // Auth state listener
+        const unsubscribeAuth = auth.onAuthStateChanged((user: User | null) => {
             setCurrentUser(user);
-            setAuthLoading(false);
         });
-        return () => unsubscribe();
-    }, []);
 
-    // Effect for loading properties from Firestore
-    useEffect(() => {
-        if (!db) return;
-        setConnectionStatus('connecting');
-
-        const unsubscribe = db.collection('properties').onSnapshot(
+        // Firestore properties listener
+        const unsubscribeProperties = db.collection('properties').onSnapshot(
             (snapshot: any) => {
-                const fetchedProperties = snapshot.docs.map((doc: any) => ({
-                    id: doc.id,
-                    ...doc.data(),
-                }));
-                setProperties(fetchedProperties);
+                const props = snapshot.docs.map((doc: any) => ({ id: doc.id, ...doc.data() }));
+                setProperties(props);
                 setConnectionStatus('online');
             },
             (error: any) => {
-                console.error("Error al obtener propiedades de Firestore: ", error);
+                console.error("Error fetching properties:", error);
                 setConnectionStatus('offline');
             }
         );
 
-        return () => unsubscribe();
-    }, []);
-
-    // Effect for loading reviews from Firestore
-    useEffect(() => {
-        if (!db) return;
-        setConnectionStatus('connecting');
-
-        const unsubscribe = db.collection('reviews')
-            .orderBy('date', 'desc')
-            .onSnapshot(
+        // Firestore reviews listener
+        const unsubscribeReviews = db.collection('reviews').orderBy('date', 'desc').onSnapshot(
             (snapshot: any) => {
-                const fetchedReviews: Review[] = snapshot.docs.map((doc: any) => ({
-                    id: doc.id,
-                    ...doc.data(),
-                }));
-                setReviews(fetchedReviews);
+                const fetchedReviews = snapshot.docs.map((doc: any) => ({ id: doc.id, ...doc.data() }));
+                setReviews([...INITIAL_REVIEWS, ...fetchedReviews]);
                 setConnectionStatus('online');
             },
             (error: any) => {
-                console.error("Error al obtener reseñas de Firestore: ", error);
+                console.error("Error fetching reviews:", error);
                 setConnectionStatus('offline');
             }
         );
-        return () => unsubscribe();
-    }, []);
-    
 
-    // Effect for loading favorites from localStorage
-    useEffect(() => {
-        try {
-            const storedFavorites = localStorage.getItem('favorites');
-            if (storedFavorites) {
-                setFavorites(JSON.parse(storedFavorites));
-            }
-        } catch (error) {
-            console.error("No se pudieron cargar los favoritos:", error);
+        const storedFavorites = localStorage.getItem('favorites');
+        if (storedFavorites) {
+            setFavorites(JSON.parse(storedFavorites));
         }
+
+        return () => {
+            unsubscribeAuth();
+            unsubscribeProperties();
+            unsubscribeReviews();
+        };
     }, []);
 
-    // --- Handlers ---
-    
-    const handleEnterApp = useCallback(() => {
-        setAppState('entering');
-        setTimeout(() => {
-            setAppState('main');
-        }, 1200); // This duration should match the exit animation
-    }, []);
-    
-    const handleAcceptPrivacy = useCallback(() => {
-        try {
-            localStorage.setItem(PRIVACY_CONSENT_KEY, 'accepted');
-        } catch (error) { console.error("No se pudo guardar la preferencia de privacidad:", error); }
-        setPrivacyState('accepted');
-    }, []);
+    useEffect(() => {
+        localStorage.setItem('favorites', JSON.stringify(favorites));
+    }, [favorites]);
 
-    const handleRejectPrivacy = useCallback(() => {
-        try {
-            localStorage.setItem(PRIVACY_CONSENT_KEY, 'rejected');
-        } catch (error) { console.error("No se pudo guardar la preferencia de privacidad:", error); }
-        setPrivacyState('rejected');
-    }, []);
+    const handleLoginClick = useCallback(() => setLoginModalOpen(true), []);
+    const handleLogout = useCallback(() => auth.signOut(), []);
 
-    const resetPrivacyAndRestart = () => {
-        try {
-            localStorage.removeItem(PRIVACY_CONSENT_KEY);
-        } catch (error) { console.error("No se pudo reiniciar la preferencia de privacidad:", error); }
-        setPrivacyState('pending');
-        setAppState('landing');
-        setCurrentView('home');
-    };
-    
     const handleViewChange = useCallback((view: View) => {
-        if (view === currentView) {
-            setSidebarOpen(false);
-            return;
-        }
-
-        setAnimationClass('animate-page-exit');
-        setSidebarOpen(false);
-
-        setTimeout(() => {
+        if (view === currentView) return;
+        const pageContainer = document.getElementById('page-content');
+        if (pageContainer) {
+            pageContainer.classList.add('animate-page-exit');
+            setTimeout(() => {
+                setCurrentView(view);
+                setPageKey(Date.now());
+                window.scrollTo(0, 0);
+            }, 300);
+        } else {
             setCurrentView(view);
             window.scrollTo(0, 0);
-            setAnimationClass('animate-page-enter');
-        }, 300); // Duration must match the CSS exit animation
+        }
+        setSideBarOpen(false);
     }, [currentView]);
 
-    const handleLogout = useCallback(async () => {
-        if (!auth) return;
-        try {
-            await auth.signOut();
-            setCurrentUser(null);
-            handleViewChange('home');
-        } catch (error) {
-            console.error("Error al cerrar sesión: ", error);
-        }
-    }, [handleViewChange]);
-
     const handleToggleFavorite = useCallback((id: string) => {
-        const newFavorites = favorites.includes(id)
-            ? favorites.filter(favId => favId !== id)
-            : [...favorites, id];
-        setFavorites(newFavorites);
-        try {
-            localStorage.setItem('favorites', JSON.stringify(newFavorites));
-        } catch (error) {
-            console.error("No se pudieron guardar los favoritos:", error);
-        }
-    }, [favorites]);
-    
+        setFavorites(prev =>
+            prev.includes(id) ? prev.filter(favId => favId !== id) : [...prev, id]
+        );
+    }, []);
+
     const handleAddReview = useCallback(async (reviewData: Omit<Review, 'id' | 'author' | 'avatarUrl' | 'userId' | 'date'>) => {
         if (!currentUser || !db) return;
-        const newReview = {
-            ...reviewData,
-            author: currentUser.displayName || 'Anónimo',
-            avatarUrl: currentUser.photoURL || `https://i.pravatar.cc/150?u=${currentUser.uid}`,
-            userId: currentUser.uid,
-            date: new Date().toISOString()
-        };
         try {
+            const newReview = {
+                ...reviewData,
+                author: currentUser.displayName || 'Anónimo',
+                avatarUrl: currentUser.photoURL || `https://i.pravatar.cc/150?u=${currentUser.uid}`,
+                userId: currentUser.uid,
+                date: new Date().toISOString(),
+            };
             await db.collection('reviews').add(newReview);
         } catch (error) {
             console.error("Error al añadir reseña: ", error);
+            alert("No se pudo enviar tu reseña. Inténtalo más tarde.");
         }
     }, [currentUser]);
 
     const handleDeleteReview = useCallback(async (reviewId: string) => {
-        if (!db) return;
-        const reviewToDelete = reviews.find(r => r.id === reviewId);
-        if (reviewToDelete && reviewToDelete.userId === currentUser?.uid) {
+        if (!db || !currentUser) return;
+        if (reviewId.startsWith('demo-')) {
+            alert("No se pueden eliminar las reseñas de demostración.");
+            return;
+        }
+        if (window.confirm("¿Estás seguro de que quieres eliminar esta reseña?")) {
             try {
                 await db.collection('reviews').doc(reviewId).delete();
             } catch (error) {
                 console.error("Error al eliminar reseña: ", error);
+                alert("No se pudo eliminar tu reseña. Inténtalo más tarde.");
             }
         }
-    }, [reviews, currentUser]);
+    }, [currentUser]);
+
+    const handlePrivacyAccept = useCallback(() => {
+        localStorage.setItem(PRIVACY_CONSENT_KEY, 'accepted');
+        setPrivacyState('accepted');
+    }, []);
+
+    const handlePrivacyReject = useCallback(() => {
+        localStorage.setItem(PRIVACY_CONSENT_KEY, 'rejected');
+        setPrivacyState('rejected');
+    }, []);
+
+    const handlePrivacyReset = useCallback(() => {
+        localStorage.removeItem(PRIVACY_CONSENT_KEY);
+        setPrivacyState('pending');
+    }, []);
+
+    const handleEnterSite = useCallback(() => {
+        setIsExitingLanding(true);
+        setTimeout(() => setAppState('main'), 1200);
+    }, []);
     
-    // --- Memos for derived data ---
-    const featuredProperties = useMemo(() => properties.filter(p => p.isFeatured), [properties]);
+    // Derived state (with status filtering)
+    const featuredProperties = useMemo(() => properties.filter(p => p.isFeatured && (p.status === 'Disponible' || !p.status)), [properties]);
+    const saleProperties = useMemo(() => properties.filter(p => p.listingType === 'Venta' && (p.status === 'Disponible' || !p.status)), [properties]);
+    const rentProperties = useMemo(() => properties.filter(p => p.listingType === 'Renta' && (p.status === 'Disponible' || !p.status)), [properties]);
     const favoriteProperties = useMemo(() => properties.filter(p => favorites.includes(p.id)), [properties, favorites]);
-    const saleProperties = useMemo(() => properties.filter(p => p.listingType === 'Venta'), [properties]);
-    const rentProperties = useMemo(() => properties.filter(p => p.listingType === 'Renta'), [properties]);
 
-
-    // --- Render Logic ---
-    // Check for critical errors first.
-    if (!process.env.API_KEY) return <ApiKeyErrorScreen />;
-    if (firebaseInitError) return <FirebaseInitErrorScreen error={firebaseInitError} />;
+    const renderView = () => {
+        switch (currentView) {
+            case 'home':
+                return (
+                    <>
+                        <FeaturedProperties properties={featuredProperties} onToggleFavorite={handleToggleFavorite} favorites={favorites} />
+                        <AboutUsSection />
+                        <ServicesSection />
+                        <ReviewsSection reviews={reviews} currentUser={currentUser} onAddReview={handleAddReview} onDeleteReview={handleDeleteReview} onLoginRequest={handleLoginClick} connectionStatus={connectionStatus} />
+                    </>
+                );
+            case 'buy':
+                return <PropertyList properties={saleProperties} onToggleFavorite={handleToggleFavorite} favorites={favorites} title="Propiedades en Venta" />;
+            case 'rent':
+                return <PropertyList properties={rentProperties} onToggleFavorite={handleToggleFavorite} favorites={favorites} title="Propiedades en Renta" />;
+            case 'favorites':
+                return <PropertyList properties={favoriteProperties} onToggleFavorite={handleToggleFavorite} favorites={favorites} title="Mis Favoritos" />;
+            case 'investment':
+                return <InvestmentPage />;
+            case 'privacy':
+                return <PrivacyPolicyPage />;
+            case 'contact':
+                return <ContactPage />;
+            case 'my-reviews':
+                return <UserReviewsPage allReviews={reviews} currentUser={currentUser} onDeleteReview={handleDeleteReview} />;
+            default:
+                const _: never = currentView;
+                return <p>Página no encontrada</p>;
+        }
+    };
     
-    // Render landing page sequence. The app always starts here.
-    if (appState === 'landing' || appState === 'entering') {
-        return <LandingPage onEnter={handleEnterApp} isExiting={appState === 'entering'} />;
+    // Global Error Handling & Page States
+    if (firebaseInitError?.message === 'API_KEY_MISSING') {
+        return <ApiKeyErrorScreen />;
     }
-    
-    // If we are in 'main' state and user rejected privacy, show the rejection page.
-    if (appState === 'main' && privacyState === 'rejected') {
-        return <PrivacyRejectionPage onReset={resetPrivacyAndRestart} />;
+    if (firebaseInitError) {
+        return <FirebaseInitErrorScreen error={firebaseInitError} />;
     }
-
-    // --- Main App Render ---
-    // This will only render if appState is 'main' and privacy is not rejected.
-    
-    let content;
-    switch (currentView) {
-        case 'home':
-            content = (
-                <>
-                    <FeaturedProperties properties={featuredProperties} onToggleFavorite={handleToggleFavorite} favorites={favorites} />
-                    <ServicesSection />
-                    <ReviewsSection reviews={reviews} currentUser={currentUser} onAddReview={handleAddReview} onDeleteReview={handleDeleteReview} onLoginRequest={() => setLoginModalOpen(true)} connectionStatus={connectionStatus}/>
-                </>
-            );
-            break;
-        case 'buy':
-            content = <PropertyList properties={saleProperties} onToggleFavorite={handleToggleFavorite} favorites={favorites} title="Propiedades en Venta" />;
-            break;
-        case 'rent':
-            content = <PropertyList properties={rentProperties} onToggleFavorite={handleToggleFavorite} favorites={favorites} title="Propiedades en Renta" />;
-            break;
-        case 'favorites':
-            content = <PropertyList properties={favoriteProperties} onToggleFavorite={handleToggleFavorite} favorites={favorites} title="Mis Favoritos" />;
-            break;
-        case 'my-reviews':
-             content = <UserReviewsPage allReviews={reviews} currentUser={currentUser} onDeleteReview={handleDeleteReview} />;
-             break;
-        case 'privacy':
-            content = <PrivacyPolicyPage />;
-            break;
-        case 'investment':
-            content = <InvestmentPage />;
-            break;
-        case 'contact':
-            content = <ContactPage />;
-            break;
-        default:
-            content = <h1 className="text-2xl">Página no encontrada</h1>;
+    if (privacyState === 'rejected') {
+        return <PrivacyRejectionPage onReset={handlePrivacyReset} />;
+    }
+    if (appState === 'landing') {
+        return <LandingPage onEnter={handleEnterSite} isExiting={isExitingLanding} />;
     }
 
     return (
-        <div className="flex flex-col min-h-screen bg-slate-50 relative">
-            <Header onMenuClick={() => setSidebarOpen(true)} currentUser={currentUser} onLogout={handleLogout} onLoginClick={() => setLoginModalOpen(true)} onViewChange={handleViewChange} />
-            <SideBar isOpen={isSidebarOpen} onClose={() => setSidebarOpen(false)} currentView={currentView} onViewChange={handleViewChange} />
-
-            <main className={`container mx-auto px-4 py-8 flex-grow ${animationClass}`}>
-                {content}
-            </main>
-
-            <Footer />
-
-            <LoginModal isOpen={isLoginModalOpen} onClose={() => setLoginModalOpen(false)} />
+        <div className="flex flex-col min-h-screen bg-slate-50">
+            <Header onMenuClick={() => setSideBarOpen(true)} currentUser={currentUser} onLogout={handleLogout} onLoginClick={handleLoginClick} onViewChange={handleViewChange} />
+            <SideBar currentView={currentView} onViewChange={handleViewChange} isOpen={isSideBarOpen} onClose={() => setSideBarOpen(false)} onOpen={() => setSideBarOpen(true)} />
             
-            {/* The privacy banner now appears here, over the main app content, only if needed */}
-            {appState === 'main' && privacyState === 'pending' && <PrivacyBanner onAccept={handleAcceptPrivacy} onReject={handleRejectPrivacy} />}
+            <main id="page-content" key={pageKey} className="flex-grow container mx-auto px-4 py-8 animate-page-enter">
+                {renderView()}
+            </main>
+            
+            <Footer />
+            <LoginModal isOpen={isLoginModalOpen} onClose={() => setLoginModalOpen(false)} />
+            {privacyState === 'pending' && <PrivacyBanner onAccept={handlePrivacyAccept} onReject={handlePrivacyReject} />}
+            {currentView === 'home' && <FloatingSellButton onClick={() => setSellModalOpen(true)} />}
+            <SellRequestModal isOpen={isSellModalOpen} onClose={() => setSellModalOpen(false)} />
         </div>
     );
 };

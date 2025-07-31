@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Property } from '../types';
 
@@ -21,7 +22,7 @@ const HeartIcon = ({ filled }: { filled: boolean }) => (
 );
 
 const DetailIcon = ({ children }: { children: React.ReactNode }) => (
-  <div className="w-6 h-6 mr-2 text-green-600 flex-shrink-0">{children}</div>
+  <div className="w-6 h-6 mr-3 text-green-600 flex-shrink-0">{children}</div>
 );
 
 export const PropertyDetail: React.FC<PropertyDetailProps> = ({ property, onToggleFavorite, isFavorite }) => {
@@ -45,14 +46,33 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ property, onTogg
     }
   }, [property]); // Re-run effect if the property object itself changes
 
-  const { category, listingType, address, price, mainFeatures, description, services, sqft, frontage, depth, rooms, bathrooms } = property;
+  const { category, listingType, address, price, mainFeatures, description, services, sqft, frontage, depth, rooms, bathrooms, status } = property;
   const bannerText = `${category} en ${listingType}`;
+  const isAvailable = status === 'Disponible' || !status; // Treat missing status as available
+  
+  // Create a dynamic list of details, filtering out any that are missing or zero.
+  const propertyDetails = [
+    { value: sqft, label: "m² de superficie", icon: <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" /></svg> },
+    { value: frontage, label: "m de frente", icon: <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75" /></svg> },
+    { value: depth, label: "m de fondo", icon: <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m0 0l-6.75-6.75M12 19.5l6.75-6.75" /></svg> },
+    { value: rooms, label: rooms === 1 ? "recámara" : "recámaras", icon: <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" /></svg> },
+    { value: bathrooms, label: bathrooms === 1 ? "baño" : "baños", icon: <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12.75v-2.625A3.375 3.375 0 015.625 6.75h12.75c1.865 0 3.375 1.51 3.375 3.375v2.625M16.5 6.75v3.75m-6-3.75v3.75m-6-3.75v3.75M3 13.5h18M3 17.25h18" /></svg> },
+  ].filter(detail => detail.value);
 
   return (
     <div>
       {/* Image Gallery */}
-      <div className="relative">
+      <div className="relative overflow-hidden">
         <img src={mainImage} alt={address} className="w-full h-64 sm:h-80 object-cover" />
+        
+        {!isAvailable && (
+            <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-10 pointer-events-none">
+                <div className="transform -rotate-12 border-4 border-white text-white font-extrabold text-5xl uppercase tracking-widest py-4 px-10 bg-black/60 backdrop-blur-sm shadow-2xl">
+                    {status}
+                </div>
+            </div>
+        )}
+
         <div className="absolute top-4 left-4 px-3 py-1.5 bg-slate-800/80 backdrop-blur-sm text-white font-bold text-sm rounded-full shadow-lg uppercase tracking-wider">
             {bannerText}
         </div>
@@ -112,16 +132,22 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ property, onTogg
         </div>
 
         {/* Details Section */}
-        <div className="mb-6">
-            <h3 className="text-lg font-semibold mb-3 text-slate-700">Detalles del Inmueble</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-3 text-slate-600">
-                <div className="flex items-center"><DetailIcon><path d="M7 7a1 1 0 011-1h8a1 1 0 011 1v8a1 1 0 11-2 0V8H8a1 1 0 01-1-1z" /><path fillRule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V5h12a1 1 0 100-2H3z" clipRule="evenodd" /></DetailIcon> {sqft.toLocaleString('es-MX')} m² de superficie</div>
-                <div className="flex items-center"><DetailIcon><path strokeLinecap="round" strokeLinejoin="round" d="M4 8h16M4 16h16M8 4l-4 4 4 4m8 8l4-4-4-4" /></DetailIcon> {frontage}m de frente</div>
-                {rooms && <div className="flex items-center"><DetailIcon><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" /></DetailIcon> {rooms} recámaras</div>}
-                {bathrooms && <div className="flex items-center"><DetailIcon><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12.75v-2.625A3.375 3.375 0 015.625 6.75h12.75c1.865 0 3.375 1.51 3.375 3.375v2.625M16.5 6.75v3.75m-6-3.75v3.75m-6-3.75v3.75M3 13.5h18M3 17.25h18" /></DetailIcon> {bathrooms} baños</div>}
-                <div className="flex items-center"><DetailIcon><path strokeLinecap="round" strokeLinejoin="round" d="M8 4v16m8-16v16M4 8l4-4 4 4m8 8l-4 4-4-4" /></DetailIcon> {depth}m de fondo</div>
+        {propertyDetails.length > 0 && (
+            <div className="mb-6">
+                <h3 className="text-lg font-semibold mb-3 text-slate-700">Detalles del Inmueble</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4 text-slate-700">
+                    {propertyDetails.map((detail, index) => (
+                        <div key={index} className="flex items-center">
+                            <DetailIcon>{detail.icon}</DetailIcon>
+                            <span>
+                                <span className="font-bold">{detail.value.toLocaleString('es-MX')}</span>
+                                {` ${detail.label}`}
+                            </span>
+                        </div>
+                    ))}
+                </div>
             </div>
-        </div>
+        )}
 
         {/* Services */}
         {services && services.length > 0 && (
@@ -135,12 +161,14 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ property, onTogg
             </div>
         )}
         
-        <a 
-          href={`mailto:${contactEmail}?subject=Interesado en ${category} en ${encodeURIComponent(address)}`}
-          className="w-full block text-center mt-6 bg-green-600 text-white font-bold py-4 px-4 rounded-lg hover:bg-green-700 transition duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 text-lg"
-        >
-            Contactar al Vendedor
-        </a>
+        {isAvailable && (
+            <a 
+              href={`mailto:${contactEmail}?subject=Interesado en ${category} en ${encodeURIComponent(address)}`}
+              className="w-full block text-center mt-6 bg-green-600 text-white font-bold py-4 px-4 rounded-lg hover:bg-green-700 transition duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 text-lg"
+            >
+                Contactar al Vendedor
+            </a>
+        )}
       </div>
     </div>
   );
