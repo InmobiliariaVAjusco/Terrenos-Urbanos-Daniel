@@ -1,6 +1,12 @@
-
 import React, { useState, useEffect } from 'react';
 import { Property } from '../types';
+
+// To inform TypeScript about the global gtag function
+declare global {
+    interface Window {
+        gtag?: (...args: any[]) => void;
+    }
+}
 
 interface PropertyDetailProps {
   property: Property;
@@ -26,7 +32,18 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ property, onTogg
     if (property.images && property.images.length > 0) {
         setMainImage(property.images[0]);
     }
-  }, [property.images]);
+
+    // Fire Google Analytics event for property view
+    if (typeof window.gtag === 'function') {
+        window.gtag('event', 'view_item', {
+            "items": [{
+                "item_id": property.id,
+                "item_name": property.address,
+                "item_category": property.category
+            }]
+        });
+    }
+  }, [property]); // Re-run effect if the property object itself changes
 
   const { category, listingType, address, price, mainFeatures, description, services, sqft, frontage, depth, rooms, bathrooms } = property;
   const bannerText = `${category} en ${listingType}`;
