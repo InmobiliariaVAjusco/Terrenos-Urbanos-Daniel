@@ -60,12 +60,12 @@ export interface Advisor {
 
 export type PrivacyState = 'pending' | 'accepted' | 'rejected';
 
-export type View = 'home' | 'buy' | 'favorites' | 'rent' | 'investment' | 'privacy' | 'contact' | 'my-reviews';
+export type View = 'home' | 'buy' | 'favorites' | 'rent' | 'budget' | 'privacy' | 'contact' | 'my-reviews' | 'sell-success';
 
 export type SellRequestData = {
   name: string;
   email: string;
-  phone: string;
+  phone:string;
   address: string;
   propertyType: string;
   description: string;

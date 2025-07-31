@@ -32,14 +32,6 @@ Para mantener tu `apiKey` segura, no la pondremos directamente en el código. Us
     *   **Value:** Pega aquí la `apiKey` que copiaste de tu `firebaseConfig`.
 4.  Guarda los cambios. Vercel usará automáticamente esta clave durante el proceso de build.
 
-**Para Pruebas Locales:**
-
-Para que el comando `npm run build` funcione localmente, necesitas que la variable de entorno esté disponible. La forma más fácil es prefijar el comando en tu terminal:
-
-```bash
-API_KEY="tu-api-key-aqui" npm run build
-```
-
 ### ✅ Paso 3: Habilitar los Servicios de Firebase
 
 1.  **Habilitar Autenticación:**
@@ -89,8 +81,8 @@ API_KEY="tu-api-key-aqui" npm run build
 
 Si la aplicación muestra un error de conexión, revisa esta lista punto por punto. El 99% de los problemas se resuelven aquí.
 
-*   **[  ] ¿La variable de entorno `API_KEY` está configurada en Vercel?**
-    *   Abre la configuración de tu proyecto en Vercel y verifica que la variable `API_KEY` exista y que su valor sea correcto. ¡Son sensibles a mayúsculas y minúsculas!
+*   **[  ] ¿La variable de entorno `API_KEY` está configurada?**
+    *   Para Vercel, verifica la configuración del proyecto. Para desarrollo local, asegúrate de que el comando que ejecutas la tenga (ver paso de desarrollo local).
 
 *   **[  ] ¿El proveedor de "Correo/Contraseña" está HABILITADO?**
     *   Ve a `Firebase Console > Authentication > Sign-in method`. El interruptor para "Correo electrónico/Contraseña" debe estar en azul (activado).

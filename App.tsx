@@ -10,7 +10,7 @@ import { LoginModal } from './components/LoginModal';
 import { LandingPage } from './components/LandingPage';
 import { PrivacyRejectionPage } from './components/PrivacyRejectionPage';
 import { PrivacyPolicyPage } from './components/PrivacyPolicyPage';
-import { InvestmentPage } from './components/InvestmentPage';
+import { BudgetPage } from './components/InvestmentPage';
 import { ContactPage } from './components/ContactPage';
 import { FeaturedProperties } from './components/FeaturedProperties';
 import { ServicesSection } from './components/ServicesSection';
@@ -18,6 +18,7 @@ import { AboutUsSection } from './components/AboutUsSection';
 import { UserReviewsPage } from './components/UserReviewsPage';
 import { FloatingSellButton } from './components/FloatingSellButton';
 import { SellRequestModal } from './components/SellRequestModal';
+import { SellSuccessPage } from './components/SellSuccessPage';
 import { Property, User, Review, PrivacyState, View } from './types';
 import { INITIAL_REVIEWS } from './constants';
 import { auth, db, firebaseInitError } from './firebase';
@@ -90,6 +91,14 @@ const App: React.FC = () => {
 
     // Data Fetching and Auth Listeners
     useEffect(() => {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('form-submitted') === 'true') {
+            setCurrentView('sell-success');
+            // Clean the URL to avoid showing the success page on refresh
+            const newUrl = window.location.pathname;
+            window.history.replaceState({ path: newUrl }, '', newUrl);
+        }
+
         const consent = localStorage.getItem(PRIVACY_CONSENT_KEY);
         if (consent === 'accepted' || consent === 'rejected') {
             setPrivacyState(consent);
@@ -246,14 +255,16 @@ const App: React.FC = () => {
                 return <PropertyList properties={rentProperties} onToggleFavorite={handleToggleFavorite} favorites={favorites} title="Propiedades en Renta" />;
             case 'favorites':
                 return <PropertyList properties={favoriteProperties} onToggleFavorite={handleToggleFavorite} favorites={favorites} title="Mis Favoritos" />;
-            case 'investment':
-                return <InvestmentPage />;
+            case 'budget':
+                return <BudgetPage allProperties={properties} onToggleFavorite={handleToggleFavorite} favorites={favorites} />;
             case 'privacy':
                 return <PrivacyPolicyPage />;
             case 'contact':
                 return <ContactPage />;
             case 'my-reviews':
                 return <UserReviewsPage allReviews={reviews} currentUser={currentUser} onDeleteReview={handleDeleteReview} />;
+             case 'sell-success':
+                return <SellSuccessPage onGoHome={() => handleViewChange('home')} />;
             default:
                 const _: never = currentView;
                 return <p>Página no encontrada</p>;

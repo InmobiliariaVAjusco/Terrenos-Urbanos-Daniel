@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Property } from '../types';
 
@@ -26,7 +25,7 @@ const DetailIcon = ({ children }: { children: React.ReactNode }) => (
 );
 
 export const PropertyDetail: React.FC<PropertyDetailProps> = ({ property, onToggleFavorite, isFavorite }) => {
-  const contactEmail = 'h.g.inmobiliario@gmail.com';
+  const contactEmail = 'inmuebles135@gmail.com';
   const [mainImage, setMainImage] = useState(property.images?.[0] || '');
 
   useEffect(() => {

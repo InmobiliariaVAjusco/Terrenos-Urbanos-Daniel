@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { ADVISORS } from '../constants';
 import { AdvisorCard } from './AdvisorCard';
@@ -17,7 +16,7 @@ const LocationIcon = () => (
     </svg>
 );
 
-const sharedEmail = 'h.g.inmobiliario@gmail.com';
+const sharedEmail = 'inmuebles135@gmail.com';
 
 export const ContactPage: React.FC = () => {
     const location = {

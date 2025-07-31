@@ -1,4 +1,3 @@
-
 import React from 'react';
 
 export const PrivacyPolicyPage: React.FC = () => {
@@ -54,7 +53,7 @@ export const PrivacyPolicyPage: React.FC = () => {
           Usted tiene derecho a conocer qué datos personales tenemos de usted, para qué los utilizamos y las condiciones del uso que les damos (Acceso). Asimismo, es su derecho solicitar la corrección de su información personal en caso de que esté desactualizada, sea inexacta o incompleta (Rectificación); que la eliminemos de nuestros registros o bases de datos cuando considere que la misma no está siendo utilizada adecuadamente (Cancelación); así como oponerse al uso de sus datos personales para fines específicos (Oposición). Estos derechos se conocen como derechos ARCO.
         </p>
         <p>
-          Para el ejercicio de cualquiera de los derechos ARCO, puede enviar una solicitud a través del correo electrónico: <a href="mailto:privacidad@inmueblesv.example.com" className="text-green-600 hover:underline">privacidad@inmueblesv.example.com</a>.
+          Para el ejercicio de cualquiera de los derechos ARCO, puede enviar una solicitud a través del correo electrónico: <a href="mailto:inmuebles135@gmail.com" className="text-green-600 hover:underline">inmuebles135@gmail.com</a>.
         </p>
 
         <h2 className="text-2xl font-semibold mt-6">6. Seguridad de los Datos</h2>

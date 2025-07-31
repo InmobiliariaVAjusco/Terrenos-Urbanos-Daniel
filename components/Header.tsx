@@ -9,7 +9,7 @@ interface HeaderProps {
     currentUser: User | null;
     onLogout: () => void;
     onLoginClick: () => void;
-    onViewChange: (view: View) => void; // <-- Prop unificada
+    onViewChange: (view: View) => void;
 }
 
 const MenuIcon = () => (
@@ -19,6 +19,17 @@ const MenuIcon = () => (
 );
 
 export const Header: React.FC<HeaderProps> = ({ onMenuClick, currentUser, onLogout, onLoginClick, onViewChange }) => {
+    
+    const getFriendlyName = (user: User): string => {
+        if (user.displayName) {
+            return user.displayName.split(' ')[0];
+        }
+        if (user.email) {
+            return user.email.split('@')[0];
+        }
+        return 'Usuario';
+    };
+
     return (
         <header className="bg-green-700 text-white shadow-md sticky top-0 z-30">
             <div className="container mx-auto px-4 py-3 flex items-center justify-between">
@@ -54,9 +65,14 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick, currentUser, onLogo
                 </div>
 
                 {/* Right Side: Login/User Menu */}
-                <div className="flex items-center">
+                <div className="flex items-center gap-4">
                     {currentUser ? (
-                        <UserMenu user={currentUser} onLogout={onLogout} onViewChange={onViewChange} />
+                        <>
+                          <span className="hidden md:block text-sm font-medium text-green-100">
+                            Hola, <span className="font-semibold text-white">{getFriendlyName(currentUser)}</span>
+                          </span>
+                          <UserMenu user={currentUser} onLogout={onLogout} onViewChange={onViewChange} />
+                        </>
                     ) : (
                         <button
                             onClick={onLoginClick}
