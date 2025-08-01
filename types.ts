@@ -60,7 +60,7 @@ export interface Advisor {
 
 export type PrivacyState = 'pending' | 'accepted' | 'rejected';
 
-export type View = 'home' | 'buy' | 'favorites' | 'rent' | 'budget' | 'privacy' | 'contact' | 'my-reviews' | 'sell-success';
+export type View = 'home' | 'buy' | 'favorites' | 'rent' | 'budget' | 'privacy' | 'contact' | 'my-reviews' | 'sell-success' | 'cookie-policy';
 
 export type SellRequestData = {
   name: string;

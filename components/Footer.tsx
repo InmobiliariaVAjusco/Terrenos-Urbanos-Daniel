@@ -1,7 +1,12 @@
-import React from 'react';
 
-export const Footer: React.FC = () => {
-  // URLs will be added later when provided by the user.
+import React from 'react';
+import { View } from '../types';
+
+interface FooterProps {
+  onViewChange: (view: View) => void;
+}
+
+export const Footer: React.FC<FooterProps> = ({ onViewChange }) => {
   const socialLinks = {
     whatsapp: 'https://wa.me/c/5215568982403',
     facebook: 'https://www.facebook.com/humberto.g.inmobiliario',
@@ -54,10 +59,24 @@ export const Footer: React.FC = () => {
             </div>
           </div>
           
-          {/* Center Section: Copyright */}
+          {/* Center Section: Copyright & Privacy */}
           <div className="md:w-1/3 text-center text-sm text-slate-600 order-first md:order-none">
             <p className="font-semibold text-slate-800">Inmobiliaria V</p>
             <p>&copy; {new Date().getFullYear()} Todos los derechos reservados.</p>
+            <div className="mt-2 space-x-4">
+              <button 
+                onClick={() => onViewChange('privacy')}
+                className="text-slate-500 hover:text-green-600 hover:underline transition-colors"
+              >
+                Aviso de Privacidad
+              </button>
+              <button 
+                onClick={() => onViewChange('cookie-policy')}
+                className="text-slate-500 hover:text-green-600 hover:underline transition-colors"
+              >
+                Política de Cookies
+              </button>
+            </div>
           </div>
           
           {/* Right Section: Spacer to ensure the copyright is centered on desktop */}

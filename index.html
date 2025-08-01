@@ -7,13 +7,28 @@
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏠</text></svg>">
     <script src="https://cdn.tailwindcss.com"></script>
     
+    <!-- Google Analytics with Consent Mode v2 -->
+    <script>
+      // Default consent mode to denied before gtag.js loads.
+      // This is crucial for GDPR and other privacy regulations.
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('consent', 'default', {
+        'analytics_storage': 'denied',
+        'ad_storage': 'denied',
+        'ad_user_data': 'denied',
+        'ad_personalization': 'denied'
+      });
+    </script>
+    
     <!-- Global site tag (gtag.js) - Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-GZTLWX96VR"></script>
     <script>
+      // This part only initializes the dataLayer. The config call is now
+      // triggered from the React app after consent is given.
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-      gtag('config', 'G-GZTLWX96VR');
     </script>
     
     <!-- Google Fonts: Poppins -->

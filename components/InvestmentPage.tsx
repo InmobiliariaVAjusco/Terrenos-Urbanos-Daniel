@@ -1,13 +1,13 @@
+
 import React, { useState, useMemo, useCallback } from 'react';
 import { Property, ListingType, PropertyCategory } from '../types';
 import { PropertyCard } from './PropertyCard';
-import { Modal } from './Modal';
-import { PropertyDetail } from './PropertyDetail';
 
 interface BudgetPageProps {
   allProperties: Property[];
   onToggleFavorite: (id: string) => void;
   favorites: string[];
+  onSelectProperty: (property: Property) => void;
 }
 
 const propertyCategories: PropertyCategory[] = ['Casa', 'Departamento', 'Terreno', 'Rancho', 'Casa en condominio', 'Casa con terreno', 'Comercial', 'Mixto'];
@@ -25,13 +25,12 @@ const NoResultsIcon = () => (
     </svg>
 );
 
-export const BudgetPage: React.FC<BudgetPageProps> = ({ allProperties, onToggleFavorite, favorites }) => {
+export const BudgetPage: React.FC<BudgetPageProps> = ({ allProperties, onToggleFavorite, favorites, onSelectProperty }) => {
     const [listingType, setListingType] = useState<ListingType>('Venta');
     const [category, setCategory] = useState<PropertyCategory | 'all'>('all');
     const [budget, setBudget] = useState('');
     const [results, setResults] = useState<Property[]>([]);
     const [hasSearched, setHasSearched] = useState(false);
-    const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
@@ -60,9 +59,6 @@ export const BudgetPage: React.FC<BudgetPageProps> = ({ allProperties, onToggleF
         setResults([]);
         setHasSearched(false);
     };
-
-    const handleSelectProperty = useCallback((property: Property) => setSelectedProperty(property), []);
-    const handleCloseModal = useCallback(() => setSelectedProperty(null), []);
 
     const handleBudgetChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const rawValue = e.target.value.replace(/[^0-9]/g, '');
@@ -121,7 +117,7 @@ export const BudgetPage: React.FC<BudgetPageProps> = ({ allProperties, onToggleF
                     {results.length > 0 ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                             {results.map(property => (
-                                <PropertyCard key={property.id} property={property} onSelect={handleSelectProperty} onToggleFavorite={onToggleFavorite} isFavorite={favorites.includes(property.id)} />
+                                <PropertyCard key={property.id} property={property} onSelect={onSelectProperty} onToggleFavorite={onToggleFavorite} isFavorite={favorites.includes(property.id)} />
                             ))}
                         </div>
                     ) : (
@@ -133,9 +129,6 @@ export const BudgetPage: React.FC<BudgetPageProps> = ({ allProperties, onToggleF
                     )}
                 </div>
             )}
-            <Modal isOpen={!!selectedProperty} onClose={handleCloseModal}>
-                {selectedProperty && <PropertyDetail property={selectedProperty} onToggleFavorite={onToggleFavorite} isFavorite={favorites.includes(selectedProperty.id)} />}
-            </Modal>
              <style>{`
                 @keyframes fade-in {
                     from { opacity: 0; transform: translateY(20px); }

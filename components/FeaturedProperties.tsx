@@ -2,13 +2,12 @@
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { Property } from '../types';
 import { FeaturedPropertyCard } from './FeaturedPropertyCard';
-import { Modal } from './Modal';
-import { PropertyDetail } from './PropertyDetail';
 
 interface FeaturedPropertiesProps {
   properties: Property[];
   onToggleFavorite: (id: string) => void;
   favorites: string[];
+  onSelectProperty: (property: Property) => void;
 }
 
 // Arrow icons for navigation
@@ -23,9 +22,8 @@ const ChevronRightIcon = () => (
     </svg>
 );
 
-export const FeaturedProperties: React.FC<FeaturedPropertiesProps> = ({ properties, onToggleFavorite, favorites }) => {
+export const FeaturedProperties: React.FC<FeaturedPropertiesProps> = ({ properties, onToggleFavorite, favorites, onSelectProperty }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
   const [isPaused, setIsPaused] = useState(false); // For pausing auto-play on hover
 
   // Filtra solo las propiedades marcadas como destacadas.
@@ -54,14 +52,6 @@ export const FeaturedProperties: React.FC<FeaturedPropertiesProps> = ({ properti
     return () => clearTimeout(slideInterval); // Clear timeout on cleanup
   }, [currentIndex, isPaused, goToNext, featured.length]);
 
-  const handleSelectProperty = useCallback((property: Property) => {
-    setSelectedProperty(property);
-  }, []);
-  
-  const handleCloseModal = useCallback(() => {
-    setSelectedProperty(null);
-  }, []);
-
   if (!featured || featured.length === 0) {
     return (
         <div className="text-center py-16 bg-slate-50 rounded-lg">
@@ -86,7 +76,7 @@ export const FeaturedProperties: React.FC<FeaturedPropertiesProps> = ({ properti
           >
             <FeaturedPropertyCard
               property={property}
-              onSelect={handleSelectProperty}
+              onSelect={onSelectProperty}
               onToggleFavorite={onToggleFavorite}
               isFavorite={favorites.includes(property.id)}
             />
@@ -121,10 +111,6 @@ export const FeaturedProperties: React.FC<FeaturedPropertiesProps> = ({ properti
           />
         ))}
       </div>
-
-       <Modal isOpen={!!selectedProperty} onClose={handleCloseModal}>
-        {selectedProperty && <PropertyDetail property={selectedProperty} onToggleFavorite={onToggleFavorite} isFavorite={favorites.includes(selectedProperty.id)} />}
-      </Modal>
     </section>
   );
 };

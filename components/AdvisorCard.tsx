@@ -26,7 +26,7 @@ export const AdvisorCard: React.FC<{ advisor: Advisor }> = ({ advisor }) => (
         </div>
         <div className="p-6 pt-4 text-center flex-grow flex flex-col w-full">
             <h3 className="text-2xl font-bold text-slate-800">{advisor.name}</h3>
-            <p className="text-slate-600 mt-2 mb-4 flex-grow">{advisor.description}</p>
+            <p className="text-slate-600 mt-2 mb-4 flex-grow text-justify">{advisor.description}</p>
             <div className="mt-auto pt-4 border-t border-slate-200/80 flex flex-col sm:flex-row justify-center gap-4 text-sm font-semibold">
                 <a href={`tel:${advisor.phone}`} className="flex items-center justify-center gap-2 px-4 py-2 text-white bg-green-600 hover:bg-green-700 rounded-lg transition-colors shadow-md">
                     <PhoneIcon />

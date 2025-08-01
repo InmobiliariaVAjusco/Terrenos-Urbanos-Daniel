@@ -4,15 +4,16 @@ import React from 'react';
 interface PrivacyBannerProps {
   onAccept: () => void;
   onReject: () => void;
+  onViewPolicy: () => void;
 }
 
-export const PrivacyBanner: React.FC<PrivacyBannerProps> = ({ onAccept, onReject }) => {
+export const PrivacyBanner: React.FC<PrivacyBannerProps> = ({ onAccept, onReject, onViewPolicy }) => {
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-slate-900/95 backdrop-blur-sm text-white p-4 shadow-lg z-50 animate-slide-up" role="alertdialog" aria-live="polite" aria-label="Aviso de Privacidad">
+    <div className="fixed bottom-0 left-0 right-0 bg-slate-900/95 backdrop-blur-sm text-white p-4 shadow-lg z-50 animate-slide-up" role="alertdialog" aria-live="polite" aria-label="Aviso de Privacidad y Cookies">
       <div className="container mx-auto flex flex-col md:flex-row items-center justify-center gap-4">
         <div className="text-sm text-slate-200 text-center md:text-left flex-grow">
           <p>
-            <strong className="font-semibold text-white">Aviso de Privacidad:</strong> Usamos información de contacto y cookies para mejorar tu experiencia. Al aceptar, consientes nuestro uso de datos para mostrarte oportunidades relevantes.
+            <strong className="font-semibold text-white">Aviso de Privacidad y Cookies:</strong> Usamos cookies y tecnologías similares para analizar el tráfico y mejorar tu experiencia. Al hacer clic en "Aceptar", aceptas nuestro uso de datos. Puedes ver los detalles en nuestro <button onClick={onViewPolicy} className="font-bold text-green-400 hover:text-green-300 underline">Aviso de Privacidad</button>.
           </p>
         </div>
         <div className="flex-shrink-0 flex items-center gap-3 w-full md:w-auto">

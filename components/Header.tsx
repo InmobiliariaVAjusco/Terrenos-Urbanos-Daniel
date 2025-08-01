@@ -1,8 +1,9 @@
 
 import React, { useState, useEffect } from 'react';
 import { Logo } from './Logo';
-import { User, View } from '../types';
+import { User, View, Property } from '../types';
 import { UserMenu } from './UserMenu';
+import { NotificationPanel } from './NotificationPanel';
 
 interface HeaderProps {
     onMenuClick: () => void;
@@ -10,6 +11,10 @@ interface HeaderProps {
     onLogout: () => void;
     onLoginClick: () => void;
     onViewChange: (view: View) => void;
+    newProperties: Property[];
+    isNotificationPanelOpen: boolean;
+    onToggleNotifications: () => void;
+    onSelectProperty: (property: Property) => void;
 }
 
 const MenuIcon = () => (
@@ -18,16 +23,43 @@ const MenuIcon = () => (
     </svg>
 );
 
-export const Header: React.FC<HeaderProps> = ({ onMenuClick, currentUser, onLogout, onLoginClick, onViewChange }) => {
+const NotificationBell = ({ count, onClick }: { count: number, onClick: () => void }) => (
+    <button onClick={onClick} className="relative p-2 text-green-200 hover:text-white transition-colors" aria-label={`Notificaciones (${count})`}>
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+        </svg>
+        {count > 0 && (
+            <span className="absolute top-1.5 right-1.5 flex h-3 w-3">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500 border-2 border-green-700"></span>
+            </span>
+        )}
+    </button>
+);
+
+
+export const Header: React.FC<HeaderProps> = ({ 
+    onMenuClick, 
+    currentUser, 
+    onLogout, 
+    onLoginClick, 
+    onViewChange,
+    newProperties,
+    isNotificationPanelOpen,
+    onToggleNotifications,
+    onSelectProperty
+}) => {
     
     const getFriendlyName = (user: User): string => {
+        let name: string;
         if (user.displayName) {
-            return user.displayName.split(' ')[0];
+            name = user.displayName.split(' ')[0];
+        } else if (user.email) {
+            name = user.email.split('@')[0];
+        } else {
+            name = 'Usuario';
         }
-        if (user.email) {
-            return user.email.split('@')[0];
-        }
-        return 'Usuario';
+        return `${name}.`;
     };
 
     return (
@@ -65,9 +97,19 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick, currentUser, onLogo
                 </div>
 
                 {/* Right Side: Login/User Menu */}
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
                     {currentUser ? (
                         <>
+                          <div className="relative">
+                            <NotificationBell count={newProperties.length} onClick={onToggleNotifications} />
+                            {isNotificationPanelOpen && (
+                                <NotificationPanel 
+                                    properties={newProperties} 
+                                    onSelectProperty={onSelectProperty} 
+                                    onClose={onToggleNotifications}
+                                />
+                            )}
+                          </div>
                           <span className="hidden md:block text-sm font-medium text-green-100">
                             Hola, <span className="font-semibold text-white">{getFriendlyName(currentUser)}</span>
                           </span>

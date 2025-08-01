@@ -19,13 +19,13 @@ export const ADVISORS: Advisor[] = [
         whatsapp: '5215545313262'
     },
     {
-        name: 'Humberto G.',
-        photoUrl: 'https://res.cloudinary.com/dcm5pug0v/image/upload/v1753908865/H_G_INMOBILIARIO_l7d3t3.jpg',
+        name: 'Humberto Gonzalez.',
+        photoUrl: 'https://res.cloudinary.com/dcm5pug0v/image/upload/v1753999653/WhatsApp_Image_2025-07-31_at_3.02.51_PM_epizn1.jpg',
         description: 'Asesor experto con más de 10 años de experiencia, especializado en créditos hipotecarios y propiedades residenciales en la zona sur de CDMX.',
-        phone: '5568982403',
-        whatsapp: '5215545313262'
+        phone: '+525568982403',
+        whatsapp: '+525568982403'
     }
 ];
 
 // Configuration for Sell Request Feature
-export const FORM_SUBMIT_EMAIL = 'inmuebles135@gmail.com';
+export const FORM_SUBMIT_EMAIL = 'inmobiliaria.ajusco.info.mx@gmail.com';

@@ -9,6 +9,8 @@ const KeyIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6
 const BudgetIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v.01M12 6v-1h4v1m-4 0h4m-4 0H8m4 0h.01M12 18V5m0 13a9 9 0 110-18 9 9 0 010 18z" /></svg>;
 const ShieldIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 20.917l9-3.462 9 3.462a12.02 12.02 0 00-3.382-8.94" /></svg>;
 const MailIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>;
+const CookieIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 15.75l-2.489-2.489m0 0a3.375 3.375 0 10-4.773-4.773 3.375 3.375 0 004.774 4.774zM21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>;
+
 
 // Icons for the draggable handle
 const ChevronLeftIconHandle = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>;
@@ -104,7 +106,12 @@ export const SideBar: React.FC<SideBarProps> = ({ currentView, onViewChange, isO
     { view: 'budget', label: 'Presupuesto', icon: <BudgetIcon /> },
     { view: 'contact', label: 'Contáctanos', icon: <MailIcon /> },
   ];
-  const privacyNavItem: { view: View; label: string; icon: React.ReactNode } = { view: 'privacy', label: 'Aviso de Privacidad', icon: <ShieldIcon /> };
+  
+  const legalNavItems: { view: View; label: string; icon: React.ReactNode }[] = [
+      { view: 'privacy', label: 'Aviso de Privacidad', icon: <ShieldIcon /> },
+      { view: 'cookie-policy', label: 'Política de Cookies', icon: <CookieIcon /> },
+  ];
+
 
   const handleToggleClick = () => isOpen ? onClose() : onOpen();
 
@@ -137,8 +144,10 @@ export const SideBar: React.FC<SideBarProps> = ({ currentView, onViewChange, isO
           ))}
         </nav>
 
-        <div className="p-4 border-t border-green-800/50">
-          <SideBarLink key={privacyNavItem.label} text={privacyNavItem.label} icon={privacyNavItem.icon} onClick={() => onViewChange(privacyNavItem.view)} isActive={currentView === privacyNavItem.view} />
+        <div className="p-4 border-t border-green-800/50 space-y-2">
+           {legalNavItems.map(item => (
+            <SideBarLink key={item.label} text={item.label} icon={item.icon} onClick={() => onViewChange(item.view)} isActive={currentView === item.view} />
+          ))}
         </div>
         
         <div

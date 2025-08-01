@@ -2,14 +2,13 @@
 import React, { useState, useMemo, useCallback } from 'react';
 import { Property, PropertyCategory } from '../types';
 import { PropertyCard } from './PropertyCard';
-import { Modal } from './Modal';
-import { PropertyDetail } from './PropertyDetail';
 
 interface PropertyListProps {
   properties: Property[];
   onToggleFavorite: (id: string) => void;
   favorites: string[];
   title?: string;
+  onSelectProperty: (property: Property) => void;
 }
 
 const ITEMS_PER_PAGE = 6;
@@ -29,11 +28,10 @@ const SearchIcon = () => (
 
 const propertyCategories: PropertyCategory[] = ['Casa', 'Departamento', 'Terreno', 'Rancho', 'Casa en condominio', 'Casa con terreno', 'Comercial', 'Mixto'];
 
-export const PropertyList: React.FC<PropertyListProps> = ({ properties, onToggleFavorite, favorites, title = "Encuentra tu Inmueble Ideal" }) => {
+export const PropertyList: React.FC<PropertyListProps> = ({ properties, onToggleFavorite, favorites, title = "Encuentra tu Inmueble Ideal", onSelectProperty }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filter, setFilter] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
-  const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
 
   const filteredProperties = useMemo(() => {
     return properties
@@ -50,14 +48,6 @@ export const PropertyList: React.FC<PropertyListProps> = ({ properties, onToggle
   }, [filteredProperties, currentPage]);
 
   const totalPages = Math.ceil(filteredProperties.length / ITEMS_PER_PAGE);
-
-  const handleSelectProperty = useCallback((property: Property) => {
-    setSelectedProperty(property);
-  }, []);
-  
-  const handleCloseModal = useCallback(() => {
-    setSelectedProperty(null);
-  }, []);
 
   return (
     <section>
@@ -108,7 +98,7 @@ export const PropertyList: React.FC<PropertyListProps> = ({ properties, onToggle
             <PropertyCard 
               key={property.id} 
               property={property} 
-              onSelect={handleSelectProperty} 
+              onSelect={onSelectProperty} 
               onToggleFavorite={onToggleFavorite}
               isFavorite={favorites.includes(property.id)} 
             />
@@ -141,10 +131,6 @@ export const PropertyList: React.FC<PropertyListProps> = ({ properties, onToggle
           </nav>
         </div>
       )}
-      
-       <Modal isOpen={!!selectedProperty} onClose={handleCloseModal}>
-        {selectedProperty && <PropertyDetail property={selectedProperty} onToggleFavorite={onToggleFavorite} isFavorite={favorites.includes(selectedProperty.id)} />}
-      </Modal>
     </section>
   );
 };
