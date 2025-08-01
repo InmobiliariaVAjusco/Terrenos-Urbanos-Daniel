@@ -56,7 +56,7 @@ const ApiKeyErrorScreen = () => (
             <p className="font-bold">Acción requerida:</p>
             <ol className="list-decimal list-inside mt-2 space-y-2">
                 <li>Si estás desplegando en Vercel, ve a la configuración de tu proyecto.</li>
-                <li>Ve a <code className="bg-red-200 px-2 py-1 rounded">Settings > Environment Variables</code>.</li>
+                <li>Ve a <code className="bg-red-200 px-2 py-1 rounded">{'Settings > Environment Variables'}</code>.</li>
                 <li>Añade una nueva variable llamada <code className="bg-red-200 px-2 py-1 rounded">API_KEY</code>.</li>
                 <li>Pega tu clave de API de Firebase como el valor de esa variable.</li>
                 <li>Vuelve a desplegar tu aplicación. Consulta el archivo <code className="bg-red-200 px-2 py-1 rounded">README.md</code> para más detalles.</li>
