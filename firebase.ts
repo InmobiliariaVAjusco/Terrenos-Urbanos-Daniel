@@ -1,4 +1,3 @@
-
 // Declara que la variable 'firebase' existirá globalmente
 declare const firebase: any;
 
@@ -48,7 +47,7 @@ try {
         console.error("Error al establecer la persistencia de Firebase:", error);
     });
 
-  googleProviderInstance = firebase.auth.GoogleAuthProvider;
+  googleProviderInstance = new firebase.auth.GoogleAuthProvider();
 
 } catch (e: any) {
   console.error("Firebase initialization failed:", e);

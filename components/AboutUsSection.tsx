@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { ADVISORS } from '../constants';
 import { AdvisorCard } from './AdvisorCard';

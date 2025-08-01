@@ -82,7 +82,7 @@ Para mantener tu `apiKey` segura, no la pondremos directamente en el código. Us
 Si la aplicación muestra un error de conexión, revisa esta lista punto por punto. El 99% de los problemas se resuelven aquí.
 
 *   **[  ] ¿La variable de entorno `API_KEY` está configurada?**
-    *   Para Vercel, verifica la configuración del proyecto. Para desarrollo local, asegúrate de que el comando que ejecutas la tenga (ver paso de desarrollo local).
+    *   Para Vercel, verifica la configuración del proyecto.
 
 *   **[  ] ¿El proveedor de "Correo/Contraseña" está HABILITADO?**
     *   Ve a `Firebase Console > Authentication > Sign-in method`. El interruptor para "Correo electrónico/Contraseña" debe estar en azul (activado).

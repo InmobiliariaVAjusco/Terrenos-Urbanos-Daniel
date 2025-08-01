@@ -25,7 +25,6 @@ const DetailIcon = ({ children }: { children: React.ReactNode }) => (
 );
 
 export const PropertyDetail: React.FC<PropertyDetailProps> = ({ property, onToggleFavorite, isFavorite }) => {
-  const contactEmail = 'inmuebles135@gmail.com';
   const [mainImage, setMainImage] = useState(property.images?.[0] || '');
 
   useEffect(() => {
@@ -57,6 +56,11 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ property, onTogg
     { value: rooms, label: rooms === 1 ? "recámara" : "recámaras", icon: <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" /></svg> },
     { value: bathrooms, label: bathrooms === 1 ? "baño" : "baños", icon: <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12.75v-2.625A3.375 3.375 0 015.625 6.75h12.75c1.865 0 3.375 1.51 3.375 3.375v2.625M16.5 6.75v3.75m-6-3.75v3.75m-6-3.75v3.75M3 13.5h18M3 17.25h18" /></svg> },
   ].filter(detail => detail.value);
+  
+  const whatsappNumber = "5215568982403"; // Número oficial sin "+" o espacios
+  const whatsappMessage = encodeURIComponent(`Hola, me interesa el inmueble "${property.category}" ubicado en "${property.address}". ¿Podrían darme más información?`);
+  const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${whatsappMessage}`;
+
 
   return (
     <div>
@@ -162,7 +166,9 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ property, onTogg
         
         {isAvailable && (
             <a 
-              href={`mailto:${contactEmail}?subject=Interesado en ${category} en ${encodeURIComponent(address)}`}
+              href={whatsappUrl}
+              target="_blank" 
+              rel="noopener noreferrer"
               className="w-full block text-center mt-6 bg-green-600 text-white font-bold py-4 px-4 rounded-lg hover:bg-green-700 transition duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 text-lg"
             >
                 Contactar al Vendedor
