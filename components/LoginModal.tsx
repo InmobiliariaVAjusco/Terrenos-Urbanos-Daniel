@@ -95,6 +95,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
     setError('');
     setIsLoading(true);
     try {
+        await auth.setPersistence('local');
         await auth.signInWithEmailAndPassword(email, password);
         onClose();
     } catch (err) {
@@ -113,6 +114,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
     setError('');
     setIsLoading(true);
     try {
+        await auth.setPersistence('local');
         const userCredential = await auth.createUserWithEmailAndPassword(email, password);
         if (userCredential.user) {
             await userCredential.user.updateProfile({
@@ -132,6 +134,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
     setIsLoading(true);
     const provider = new GoogleAuthProvider();
     try {
+        await auth.setPersistence('local');
         await auth.signInWithPopup(provider);
         onClose();
     } catch (err) {
