@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Modal } from './Modal';
-import { auth, GoogleAuthProvider } from '../firebase';
+import { auth, googleAuthProvider } from '../firebase';
+
+declare const firebase: any;
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -95,7 +97,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
     setError('');
     setIsLoading(true);
     try {
-        await auth.setPersistence('local');
+        await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
         await auth.signInWithEmailAndPassword(email, password);
         onClose();
     } catch (err) {
@@ -114,7 +116,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
     setError('');
     setIsLoading(true);
     try {
-        await auth.setPersistence('local');
+        await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
         const userCredential = await auth.createUserWithEmailAndPassword(email, password);
         if (userCredential.user) {
             await userCredential.user.updateProfile({
@@ -132,9 +134,9 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
   const handleGoogleSignIn = async () => {
     setError('');
     setIsLoading(true);
-    const provider = new GoogleAuthProvider();
+    const provider = googleAuthProvider;
     try {
-        await auth.setPersistence('local');
+        await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
         await auth.signInWithPopup(provider);
         onClose();
     } catch (err) {

@@ -38,15 +38,6 @@ try {
   // Finalmente, exportar los servicios
   authInstance = firebase.auth();
   firestoreInstance = firebase.firestore();
-  
-  // Se establece explícitamente la persistencia a 'local'.
-  // Esto soluciona errores en entornos donde la detección automática de almacenamiento puede fallar
-  // (ej. "web storage must be enabled").
-  authInstance.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
-    .catch((error: any) => {
-        console.error("Error al establecer la persistencia de Firebase:", error);
-    });
-
   googleProviderInstance = new firebase.auth.GoogleAuthProvider();
 
 } catch (e: any) {
@@ -63,5 +54,5 @@ try {
 // Exporta los servicios y el posible error de inicialización
 export const auth = authInstance;
 export const db = firestoreInstance;
-export const GoogleAuthProvider = googleProviderInstance;
+export const googleAuthProvider = googleProviderInstance;
 export const firebaseInitError = initializationError;
